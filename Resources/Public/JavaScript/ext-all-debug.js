@@ -23522,7 +23522,7 @@ Ext.extend(Ext.tree.AsyncTreeNode, Ext.tree.TreeNode, {
             }
             this.loading = true;
             this.ui.beforeLoad(this);
-            var loader = this.loader || this.attributes.loader || this.getOwnerTree().getLoader();
+            var loader = this.loader || this.attributes.loader || (this.parentNode ? this.parentNode.loader : this.getOwnerTree().getLoader());
             if(loader){
                 loader.load(this, this.loadComplete.createDelegate(this, [deep, anim, callback]));
                 return;
@@ -24250,7 +24250,7 @@ Ext.extend(Ext.tree.TreeLoader, Ext.util.Observable, {
             Ext.applyIf(attr, this.baseAttrs);
         }
         if(this.applyLoader !== false){
-            attr.loader = this;
+            attr.loader = attr.loader || this;
         }
         if(typeof attr.uiProvider == 'string'){
            attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
