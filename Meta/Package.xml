@@ -3,7 +3,7 @@
     <key>ExtJS</key>
     <title>ExtJS Package</title>
     <description>The package contains ExtJS for use from FLOW3 packages. It is a slightly trimmed version of ExtJS (missing source, build, examples, documentation) with JavaScript, images and CSS moved to distinct folders.</description>
-    <version>2.2</version>
+    <version>2.2.1</version>
     <state>Final</state>
     <categories>
         <category>Testing</category>
