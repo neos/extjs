@@ -2,8 +2,14 @@
 <package xmlns="http://typo3.org/ns/2008/flow3/package">
     <key>ExtJS</key>
     <title>ExtJS Package</title>
-    <description>The package contains ExtJS for use from FLOW3 packages. It is a slightly trimmed version of ExtJS (missing source, build, examples, documentation) with JavaScript, images and CSS moved to distinct folders.</description>
-    <version>2.2.1</version>
+    <description>The package contains ExtJS for use in FLOW3 packages. It is a
+	slightly trimmed version of ExtJS (missing source, build, examples,
+	documentation) with JavaScript, images, CSS and Flash moved to distinct
+	folders.
+	In addition it contains the ux files found in the examples folder of the
+	ExtJS distribution.
+	A gray theme is included as well.</description>
+    <version>3.0.0</version>
     <categories>
         <category>Testing</category>
     </categories>
