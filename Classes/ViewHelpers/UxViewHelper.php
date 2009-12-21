@@ -33,6 +33,20 @@ namespace F3\ExtJS\ViewHelpers;
 class UxViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
+	 * @var \F3\FLOW3\Resource\Publishing\ResourcePublisher
+	 */
+	protected $resourcePublisher;
+
+	/**
+	 * Inject the FLOW3 resource publisher.
+	 *
+	 * @param \F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher
+	 */
+	public function injectResourcePublisher(\F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher) {
+		$this->resourcePublisher = $resourcePublisher;
+	}
+
+	/**
 	 * Returns the HTML needed to include the ExtJS ux class.
 	 *
 	 * = Examples =
@@ -50,8 +64,9 @@ class UxViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @api
 	 */
 	public function render($name) {
+		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
 		return '
-<script type="text/javascript" src="Resources/Packages/ExtJS/JavaScript/ux/' . $name . '.js"></script>
+<script type="text/javascript" src="' . $baseUri . 'JavaScript/ux/' . $name . '.js"></script>
 ';
 	}
 }

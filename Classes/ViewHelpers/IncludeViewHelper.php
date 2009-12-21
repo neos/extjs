@@ -33,6 +33,20 @@ namespace F3\ExtJS\ViewHelpers;
 class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
+	 * @var \F3\FLOW3\Resource\Publishing\ResourcePublisher
+	 */
+	protected $resourcePublisher;
+
+	/**
+	 * Inject the FLOW3 resource publisher.
+	 *
+	 * @param \F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher
+	 */
+	public function injectResourcePublisher(\F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher) {
+		$this->resourcePublisher = $resourcePublisher;
+	}
+
+	/**
 	 * Returns the HTML needed to include ExtJS, that is, CSS and JS includes.
 	 *
 	 * = Examples =
@@ -56,23 +70,24 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @api
 	 */
 	public function render($theme = 'xtheme-blue', $debug = FALSE) {
-		$output = '
-<link rel="stylesheet" href="Resources/Packages/ExtJS/CSS/ext-all-notheme.css" />
-<link rel="stylesheet" href="Resources/Packages/ExtJS/CSS/' . $theme . '.css" />';
+		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
+			$output = '
+<link rel="stylesheet" href="' . $baseUri . 'CSS/ext-all-notheme.css" />
+<link rel="stylesheet" href="' . $baseUri . 'CSS/' . $theme . '.css" />';
 		if ($debug) {
 			$output .= '
-<script type="text/javascript" src="Resources/Packages/ExtJS/JavaScript/adapter/ext/ext-base-debug.js"></script>
-<script type="text/javascript" src="Resources/Packages/ExtJS/JavaScript/ext-all-debug.js"></script>';
+<script type="text/javascript" src="' . $baseUri . 'JavaScript/adapter/ext/ext-base-debug.js"></script>
+<script type="text/javascript" src="' . $baseUri . 'JavaScript/ext-all-debug.js"></script>';
 		} else {
 			$output .= '
-<script type="text/javascript" src="Resources/Packages/ExtJS/JavaScript/adapter/ext/ext-base.js"></script>
-<script type="text/javascript" src="Resources/Packages/ExtJS/JavaScript/ext-all.js"></script>';
+<script type="text/javascript" src="' . $baseUri . 'JavaScript/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="' . $baseUri . 'JavaScript/ext-all.js"></script>';
 		}
 		$output .= '
 <script type="text/javascript">
-	Ext.BLANK_IMAGE_URL = \'Resources/Packages/ExtJS/images/default/s.gif\';
-	Ext.FlashComponent.EXPRESS_INSTALL_URL = \'Resources/Packages/ExtJS/Flash/expressinstall.swf\';
-	Ext.chart.Chart.CHART_URL = \'Resources/Packages/ExtJS/Flash/chart.swf\';
+	Ext.BLANK_IMAGE_URL = \'' . $baseUri . 'images/default/s.gif\';
+	Ext.FlashComponent.EXPRESS_INSTALL_URL = \'' . $baseUri . 'Flash/expressinstall.swf\';
+	Ext.chart.Chart.CHART_URL = \'' . $baseUri . 'Flash/chart.swf\';
 </script>
 ';
 
