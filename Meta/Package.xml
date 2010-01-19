@@ -9,7 +9,7 @@
 	In addition it contains the ux files found in the examples folder of the
 	ExtJS distribution.
 	A gray theme is included as well.</description>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
     <categories>
         <category>Testing</category>
     </categories>
