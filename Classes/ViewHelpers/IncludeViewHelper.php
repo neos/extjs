@@ -60,7 +60,7 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * use ExtJS.
 	 *
 	 * <code title="Use a specific theme">
-	 * <ext:include theme="xtheme-gray-extend"/>
+	 * <ext:include theme="xtheme-gray"/>
 	 * </code>
 	 *
 	 * @param string $theme The theme to include, simply the name of the CSS
