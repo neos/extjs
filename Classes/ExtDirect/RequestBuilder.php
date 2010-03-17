@@ -76,7 +76,7 @@ class RequestBuilder {
 			$request->addTransaction(
 				$transactionData->action,
 				$transactionData->method,
-				$transactionData->data,
+				is_array($transactionData->data) ? $transactionData->data : array(),
 				$transactionData->tid
 			);
 		}

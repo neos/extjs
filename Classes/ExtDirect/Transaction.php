@@ -159,7 +159,12 @@ class Transaction {
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function getArguments() {
+		if ($this->data === array()) {
+			return array();
+		}
+
 		$arguments = array();
+
 		if (!$this->request->isFormPost()) {
 			$parameters = $this->reflectionService->getMethodParameters($this->getControllerObjectName(), $this->method . 'Action');
 
