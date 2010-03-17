@@ -51,7 +51,7 @@ class RequestBuilder {
 		$postArguments = $this->environment->getRawPostArguments();
 		if (isset($postArguments['extAction'])) {
 			throw new \Exception('Not implemented');
-#			$request = $this->buildFormPostRequest();
+#			$request = $this->buildFormPostRequest($postArguments);
 		} else {
 			$request = $this->buildJsonRequest();
 		}
@@ -59,7 +59,7 @@ class RequestBuilder {
 	}
 
 	/**
-	 *
+	 * @return \F3\ExtJS\ExtDirect\Request
 	 */
 	protected function buildJsonRequest() {
 		$transactionDatas = json_decode(file_get_contents('php://input'));
@@ -73,7 +73,7 @@ class RequestBuilder {
 
 		$request = $this->objectManager->create('F3\ExtJS\ExtDirect\Request');
 		foreach ($transactionDatas as $transactionData) {
-			$request->addTransaction(
+			$request->createAndAddTransaction(
 				$transactionData->action,
 				$transactionData->method,
 				is_array($transactionData->data) ? $transactionData->data : array(),
@@ -84,7 +84,7 @@ class RequestBuilder {
 	}
 
 	/**
-	 *
+	 * @todo Well... make it work, eh?
 	 */
 	protected function buildFormPostRequest() {
 		$directRequest->setFormPost(TRUE);
@@ -94,12 +94,13 @@ class RequestBuilder {
 		$subpackageKey = $request->hasArgument('subpackageKey') ? $request->getArgument('subpackageKey') : '';
 
 		$directRequest->addTransaction(
-				$request->getArgument('extAction'),
-				$request->getArgument('extMethod'),
-				NULL,
-				$request->getArgument('extTID'),
-				$packageKey,
-				$subpackageKey);
+			$request->getArgument('extAction'),
+			$request->getArgument('extMethod'),
+			NULL,
+			$request->getArgument('extTID'),
+			$packageKey,
+			$subpackageKey
+		);
 	}
 }
 ?>

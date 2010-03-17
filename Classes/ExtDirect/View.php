@@ -23,11 +23,6 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- *
- * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
- */
-
-/**
  * A transparent view that passes on special values to the Ext Direct response.
  * This view is a singleton because it doesn't hold any state itself.
  *
@@ -84,7 +79,7 @@ class View implements \F3\FLOW3\MVC\View\ViewInterface {
 	}
 
 	/**
-	 * Add multiple variables to $this->variables.
+	 * Add multiple variables in one go.
 	 *
 	 * @param array $values array in the format array(key1 => value1, key2 => value2).
 	 * @return void

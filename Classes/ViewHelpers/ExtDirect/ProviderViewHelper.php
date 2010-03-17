@@ -33,29 +33,24 @@ namespace F3\ExtJS\ViewHelpers\ExtDirect;
 class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
+	 * @inject
 	 * @var \F3\FLOW3\Reflection\ReflectionService
 	 */
-	protected $myReflectionService;
-
-	/**
-	 * Inject the FLOW3 reflection service.
-	 *
-	 * @param \F3\FLOW3\Reflection\ReflectionService $reflectionService
-	 */
-	public function injectMyReflectionService(\F3\FLOW3\Reflection\ReflectionService $reflectionService) {
-		$this->myReflectionService = $reflectionService;
-	}
+	protected $reflectionService;
 
 	/**
 	 * Returns the JavaScript to declare the Ext Direct provider for all
-	 * controller actions that are annotated with \@extdirect
+	 * controller actions that are annotated with @extdirect
 	 *
 	 * = Examples =
 	 *
 	 * <code title="Simple">
 	 * {namespace ext=F3\ExtJS\ViewHelpers}
 	 *  ...
+	 * <script type="text/javascript">
 	 * <ext:extdirect.provider />
+	 * </script>
+	 *  ...
 	 * </code>
 	 *
 	 * TODO Cache ext direct provider config
@@ -70,13 +65,13 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 			'namespace' => $namespace,
 			'actions' => array()
 		);
-		$controllerClassNames = $this->myReflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
+		$controllerClassNames = $this->reflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
-			$methodNames = $this->myReflectionService->getClassMethodNames($controllerClassName);
+			$methodNames = $this->reflectionService->getClassMethodNames($controllerClassName);
 			foreach ($methodNames as $methodName) {
-				$methodTagsValues = $this->myReflectionService->getMethodTagsValues($controllerClassName, $methodName);
+				$methodTagsValues = $this->reflectionService->getMethodTagsValues($controllerClassName, $methodName);
 				if (isset($methodTagsValues['extdirect'])) {
-					$methodParameters = $this->myReflectionService->getMethodParameters($controllerClassName, $methodName);
+					$methodParameters = $this->reflectionService->getMethodParameters($controllerClassName, $methodName);
 					$extDirectAction = str_replace('\\', '_', str_replace('F3\\', '', $controllerClassName));
 					$providerConfig['actions'][$extDirectAction][] = array(
 						'name' => substr($methodName, 0, -6),

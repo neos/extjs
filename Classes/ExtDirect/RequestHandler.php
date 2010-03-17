@@ -118,11 +118,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 
 	/**
 	 * Returns the priority - how eager the handler is to actually handle the
-	 * request. An integer > 0 means "I want to handle this request" where
-	 * "100" is default. "0" means "I am a fallback solution".
-	 *
-	 * If the handler cannot handle the request, a LogicException should be
-	 * thrown.
+	 * request.
 	 *
 	 * @return integer The priority of the request handler
 	 * @author Robert Lemke <robert@typo3.org>

@@ -46,6 +46,8 @@ class TransactionResponse extends \F3\FLOW3\MVC\Web\Response {
 	protected $success = TRUE;
 
 	/**
+	 * Setter for the transaction result.
+	 *
 	 * @param mixed $result The result of the called action
 	 * @return void
 	 */
@@ -54,6 +56,8 @@ class TransactionResponse extends \F3\FLOW3\MVC\Web\Response {
 	}
 
 	/**
+	 * Sette for success.
+	 *
 	 * @param boolean $success The success of the called action
 	 * @return void
 	 */
@@ -63,6 +67,8 @@ class TransactionResponse extends \F3\FLOW3\MVC\Web\Response {
 
 
 	/**
+	 * Returns the result of the transaction.
+	 *
 	 * @return mixed The result
 	 */
 	public function getResult() {
@@ -70,6 +76,8 @@ class TransactionResponse extends \F3\FLOW3\MVC\Web\Response {
 	}
 
 	/**
+	 * Returns the state (success/fail) of the transaction.
+	 *
 	 * @return boolean The success
 	 */
 	public function getSuccess() {

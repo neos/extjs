@@ -33,18 +33,10 @@ namespace F3\ExtJS\ViewHelpers;
 class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
+	 * @inject
 	 * @var \F3\FLOW3\Resource\Publishing\ResourcePublisher
 	 */
 	protected $resourcePublisher;
-
-	/**
-	 * Inject the FLOW3 resource publisher.
-	 *
-	 * @param \F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher
-	 */
-	public function injectResourcePublisher(\F3\FLOW3\Resource\Publishing\ResourcePublisher $resourcePublisher) {
-		$this->resourcePublisher = $resourcePublisher;
-	}
 
 	/**
 	 * Returns the HTML needed to include ExtJS, that is, CSS and JS includes.

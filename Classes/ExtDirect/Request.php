@@ -23,11 +23,6 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- *
- * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
- */
-
-/**
  * An Ext Direct request
  *
  * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
@@ -35,6 +30,13 @@ namespace F3\ExtJS\ExtDirect;
  * @scope prototype
  */
 class Request {
+
+	/**
+	 * @inject
+	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 */
+	protected $objectManager;
+
 	/**
 	 * The transactions inside this request
 	 *
@@ -57,36 +59,65 @@ class Request {
 	protected $fileUpload = FALSE;
 
 	/**
-	 * @inject
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 * Creates an Ext Direct Transaction and adds it to the request instance.
+	 *
+	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
+	 * @param string $method The "method" – the "action name" in FLOW3 terms
+	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
+	 * @param mixed $tid The ExtDirect transaction id
+	 * @return void
 	 */
-	protected $objectManager;
-
-	public function addTransaction($action, $method, $data, $tid) {
+	public function createAndAddTransaction($action, $method, array $data, $tid) {
 		$transaction = $this->objectManager->create('F3\ExtJS\ExtDirect\Transaction', $this, $action, $method, $data, $tid);
 		$this->transactions[] = $transaction;
 	}
 
+	/**
+	 * Getter for transactions.
+	 *
+	 * @return array
+	 */
 	public function getTransactions() {
 		return $this->transactions;
 	}
 
+	/**
+	 * Whether this request represents a form post or not.
+	 *
+	 * @return boolean
+	 */
 	public function isFormPost() {
 		return $this->formPost;
 	}
 
+	/**
+	 * Marks this request as representing a form post or not.
+	 *
+	 * @param boolean $formPost
+	 * @return void
+	 */
 	public function setFormPost($formPost) {
 		$this->formPost = $formPost;
 	}
 
+	/**
+	 * Whether this request represents a file upload or not.
+	 *
+	 * @return boolean
+	 */
 	public function isFileUpload() {
 		return $this->fileUpload;
 	}
 
+	/**
+	 * Marks this request as representing a file upload or not.
+	 *
+	 * @param boolean $fileUpload
+	 * @return void
+	 */
 	public function setFileUpload($fileUpload) {
 		$this->fileUpload = $fileUpload;
 	}
-
 
 }
 ?>

@@ -79,7 +79,7 @@ class Transaction {
 	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
 	 * @param string $method The "method" – the "action name" in FLOW3 terms
 	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
-	 * @param integer $tid The ExtDirect transaction id
+	 * @param mixed $tid The ExtDirect transaction id
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function __construct(\F3\ExtJS\ExtDirect\Request $request, $action, $method, array $data, $tid) {
