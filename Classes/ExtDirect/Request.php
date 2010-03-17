@@ -34,7 +34,7 @@ namespace F3\ExtJS\ExtDirect;
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */
-class DirectRequest {
+class Request {
 	/**
 	 * The transactions inside this request
 	 *
@@ -62,21 +62,13 @@ class DirectRequest {
 	 */
 	protected $objectManager;
 
-	public function getTransactions() {
-		return $this->transactions;
+	public function addTransaction($action, $method, $data, $tid) {
+		$transaction = $this->objectManager->create('F3\ExtJS\ExtDirect\Transaction', $this, $action, $method, $data, $tid);
+		$this->transactions[] = $transaction;
 	}
 
-	public function addTransaction($action, $method, $data, $tid, $packageKey, $subpackageKey) {
-		$transaction = $this->objectManager->create('F3\ExtJS\ExtDirect\Transaction', $this);
-
-		$transaction->setAction($action);
-		$transaction->setMethod($method);
-		$transaction->setData($data);
-		$transaction->setTid($tid);
-		$transaction->setPackageKey($packageKey);
-		$transaction->setSubpackageKey($subpackageKey);
-
-		$this->transactions[] = $transaction;
+	public function getTransactions() {
+		return $this->transactions;
 	}
 
 	public function isFormPost() {

@@ -35,12 +35,19 @@ namespace F3\ExtJS\ExtDirect;
  * @scope prototype
  */
 class Transaction {
+
+	/**
+	 * @inject
+	 * @var \F3\FLOW3\Reflection\ReflectionService
+	 */
+	protected $reflectionService;
+
 	/**
 	 * The direct request this transaction belongs to
 	 *
-	 * @var \F3\ExtJS\ExtDirect\DirectRequest
+	 * @var \F3\ExtJS\ExtDirect\Request
 	 */
-	protected $directRequest;
+	protected $request;
 
 	/**
 	 * The controller / class to use
@@ -64,13 +71,6 @@ class Transaction {
 	protected $data;
 
 	/**
-	 * The type of the request (currently "rpc" for all remoting requests)
-	 *
-	 * @var string
-	 */
-	protected $type = 'rpc';
-
-	/**
 	 * The transaction ID to associate with this request
 	 *
 	 * @var int
@@ -78,39 +78,15 @@ class Transaction {
 	protected $tid;
 
 	/**
-	 * Extended transaction attribute for the package key of the controller
 	 *
-	 * @var string
+	 * @param Request $request The direct request this transaction belongs to
 	 */
-	protected $packageKey;
-
-	/**
-	 * Extended transaction attribute for the subpackage key of the controller
-	 *
-	 * @var string
-	 */
-	protected $subpackageKey;
-
-	/**
-	 *
-	 * @param DirectRequest $directRequest The direct request this transaction belongs to
-	 */
-	public function __construct(\F3\ExtJS\ExtDirect\DirectRequest $directRequest) {
-		$this->directRequest = $directRequest;
-	}
-
-	public function mapDataToParameters(array $parameters) {
-		$arguments = array();
-		// TODO Add checks for parameters
-		foreach ($parameters as $name => $options) {
-			$parameterIndex = $options['position'];
-			$arguments[$name] = $this->data[$parameterIndex];
-		}
-		return $arguments;
-	}
-
-	public function getDirectRequest() {
-		return $this->directRequest;
+	public function __construct(\F3\ExtJS\ExtDirect\Request $request, $action, $method, $data, $tid) {
+		$this->request = $request;
+		$this->action = $action;
+		$this->method = $method;
+		$this->data = $data;
+		$this->tid = $tid;
 	}
 
 	/**
@@ -120,61 +96,50 @@ class Transaction {
 		return $this->action;
 	}
 
-	/**
-	 * Set the action
-	 * @param string $action
-	 * @return void
-	 */
-	public function setAction($action) {
-		$this->action = $action;
-	}
-
 	public function getMethod() {
 		return $this->method;
-	}
-
-	public function setMethod($method) {
-		$this->method = $method;
 	}
 
 	public function getData() {
 		return $this->data;
 	}
 
-	public function setData($data) {
-		$this->data = $data;
-	}
-
 	public function getType() {
-		return $this->type;
-	}
-
-	public function setType($type) {
-		$this->type = $type;
+		return 'rpc';
 	}
 
 	public function getTid() {
 		return $this->tid;
 	}
 
-	public function setTid($tid) {
-		$this->tid = $tid;
+
+	public function getControllerObjectName() {
+		return 'F3\\' . str_replace('_', '\\', $this->action);
 	}
 
-	public function getPackageKey() {
-		return $this->packageKey;
+	/**
+	 * Ext Direct does not provide named arguments by now, so we have
+	 * to map them by reflecting on the action parameters.
+	 *
+	 * @return array The mapped arguments
+	 */
+	protected function getArguments() {
+		$arguments = array();
+		if (!$this->request->isFormPost()) {
+			$parameters = $this->reflectionService->getMethodParameters($this->getControllerObjectName(), $this->method . 'Action');
+
+			// TODO Add checks for parameters
+			foreach ($parameters as $name => $options) {
+				$parameterIndex = $options['position'];
+				$arguments[$name] = $this->data[$parameterIndex];
+			}
+
+		} else {
+			// TODO Reuse setArgumentsFromRawRequestData from Web/RequestBuilder
+		}
+		return $arguments;
 	}
 
-	public function setPackageKey($packageKey) {
-		$this->packageKey = $packageKey;
-	}
 
-	public function getSubpackageKey() {
-		return $this->subpackageKey;
-	}
-
-	public function setSubpackageKey($subpackageKey) {
-		$this->subpackageKey = $subpackageKey;
-	}
 }
 ?>

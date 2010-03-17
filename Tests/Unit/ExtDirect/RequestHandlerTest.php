@@ -1,9 +1,9 @@
 <?php
 declare(ENCODING = 'utf-8');
-namespace F3\ExtJS\ExtDirect\Controller;
+namespace F3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the FLOW3 framework.                            *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License as published by the *
@@ -23,34 +23,27 @@ namespace F3\ExtJS\ExtDirect\Controller;
  *                                                                        */
 
 /**
- * Ext Direct router controller
- * 
- * TODO Check if we can avoid ActionController at all by going directly through a special request handler
+ * Testcase for the ExtDirect Request Handler
  *
- * @version $Id: IncludeViewHelper.php 3736 2010-01-20 15:47:11Z k-fish $
+ * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class RouterController extends \F3\FLOW3\MVC\Controller\ActionController {
+class RequestHandlerTest extends \F3\Testing\BaseTestCase {
 
 	/**
-	 * @inject
-	 * @var \F3\ExtJS\ExtDirect\Router
+	 * @test
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	protected $router;
+	public function canHandleRequestReturnsTrueIfTheSapiTypeIsWebAndAnExtDirectGetParameterIsSent() {
+		$mockEnvironment = $this->getMock('F3\FLOW3\Utility\Environment');
+		$mockEnvironment->expects($this->at(0))->method('getRawGetArguments')->will($this->returnValue(array('foo' => 'bar', 'baz' => 'quux')));
+		$mockEnvironment->expects($this->at(1))->method('getRawGetArguments')->will($this->returnValue(array('foo' => 'bar', 'F3_ExtJS_ExtDirectRequest' => '1')));
 
-	protected function resolveView() {
-		$this->view = $this->objectManager->get('F3\FLOW3\MVC\View\EmptyView');
-	}
-
-	/**
-	 * The router entry point
-	 * @return void
-	 */
-	public function indexAction() {
-		$request = $this->getControllerContext()->getRequest();
-		$response = $this->getControllerContext()->getResponse();
-		return $this->router->handleRequest($request, $response);
+		$requestHandler = $this->getAccessibleMock('F3\ExtJS\ExtDirect\RequestHandler', array('dummy'), array(), '', FALSE);
+		$requestHandler->_set('environment', $mockEnvironment);
+		
+		$this->assertFalse($requestHandler->canHandleRequest());
+		$this->assertTrue($requestHandler->canHandleRequest());
 	}
 }
-
 ?>
