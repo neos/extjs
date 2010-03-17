@@ -23,11 +23,6 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- *
- * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
- */
-
-/**
  * An Ext Direct transaction
  *
  * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
@@ -73,15 +68,21 @@ class Transaction {
 	/**
 	 * The transaction ID to associate with this request
 	 *
-	 * @var int
+	 * @var integer
 	 */
 	protected $tid;
 
 	/**
+	 * Constructs the Transaction
 	 *
-	 * @param Request $request The direct request this transaction belongs to
+	 * @param \F3\ExtJS\ExtDirect\Request $request The direct request this transaction belongs to
+	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
+	 * @param string $method The "method" – the "action name" in FLOW3 terms
+	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
+	 * @param integer $tid The ExtDirect transaction id
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	public function __construct(\F3\ExtJS\ExtDirect\Request $request, $action, $method, $data, $tid) {
+	public function __construct(\F3\ExtJS\ExtDirect\Request $request, $action, $method, array $data, $tid) {
 		$this->request = $request;
 		$this->action = $action;
 		$this->method = $method;
@@ -90,29 +91,62 @@ class Transaction {
 	}
 
 	/**
-	 * @return string The action
+	 * Getter for action
+	 *
+	 * @return string
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function getAction() {
 		return $this->action;
 	}
 
+	/**
+	 * Getter for method
+	 *
+	 * @return string
+	 * @author Robert Lemke <robert@typo3.org>
+	 */
 	public function getMethod() {
 		return $this->method;
 	}
 
+	/**
+	 * Getter for data
+	 *
+	 * @return array
+	 * @author Robert Lemke <robert@typo3.org>
+	 */
 	public function getData() {
 		return $this->data;
 	}
 
+	/**
+	 * Getter for type
+	 *
+	 * @return string The transaction type, currently always "rpc"
+	 * @author Robert Lemke <robert@typo3.org>
+	 */
 	public function getType() {
 		return 'rpc';
 	}
 
+	/**
+	 * Getter for tid
+	 *
+	 * @return integer
+	 * @author Robert Lemke <robert@typo3.org>
+	 */
 	public function getTid() {
 		return $this->tid;
 	}
 
 
+	/**
+	 * Getter for the controller object name
+	 *
+	 * @return string
+	 * @author Robert Lemke <robert@typo3.org>
+	 */
 	public function getControllerObjectName() {
 		return 'F3\\' . str_replace('_', '\\', $this->action);
 	}
@@ -122,8 +156,9 @@ class Transaction {
 	 * to map them by reflecting on the action parameters.
 	 *
 	 * @return array The mapped arguments
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	protected function getArguments() {
+	public function getArguments() {
 		$arguments = array();
 		if (!$this->request->isFormPost()) {
 			$parameters = $this->reflectionService->getMethodParameters($this->getControllerObjectName(), $this->method . 'Action');

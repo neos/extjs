@@ -132,11 +132,14 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	}
 
 	/**
+	 * Sends the response
 	 *
-	 * @param array $results
+	 * @param array $results The collected results from the transaction requests
 	 * @param \F3\ExtJS\ExtDirect\Request $extDirectRequest
+	 * @return void
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	protected function sendReponse(array $results, \F3\ExtJS\ExtDirect\Request $extDirectRequest) {
+	protected function sendResponse(array $results, \F3\ExtJS\ExtDirect\Request $extDirectRequest) {
 		$response = json_encode(count($results) === 1 ? $results[0] : $results);
 		if ($extDirectRequest->isFormPost() && $extDirectRequest->isFileUpload()) {
 			header('Content-Type: text/html');
