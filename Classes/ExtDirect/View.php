@@ -32,7 +32,7 @@ namespace F3\ExtJS\ExtDirect;
 class View implements \F3\FLOW3\MVC\View\ViewInterface {
 
 	/**
-	 * @var \F3\FLOW3\MVC\Controller\Context
+	 * @var \F3\FLOW3\MVC\Controller\ControllerContext
 	 */
 	protected $controllerContext;
 
@@ -49,11 +49,11 @@ class View implements \F3\FLOW3\MVC\View\ViewInterface {
 	/**
 	 * Sets the current controller context
 	 *
-	 * @param \F3\FLOW3\MVC\Controller\Context $controllerContext
+	 * @param \F3\FLOW3\MVC\Controller\ControllerContext $controllerContext
 	 * @return void
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function setControllerContext(\F3\FLOW3\MVC\Controller\Context $controllerContext) {
+	public function setControllerContext(\F3\FLOW3\MVC\Controller\ControllerContext $controllerContext) {
 		$this->controllerContext = $controllerContext;
 	}
 
