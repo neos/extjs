@@ -57,15 +57,19 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 *
 	 * @param string $theme The theme to include, simply the name of the CSS
 	 * @param boolean $debug Whether to use the debug version of ExtJS
+	 * @param boolean $includeStylesheets Include ExtJS CSS files if true
 	 * @return string HTML needed to include ExtJS
 	 * @author Karsten Dambekalns <karsten@typo3.org>
 	 * @api
 	 */
-	public function render($theme = 'xtheme-blue', $debug = FALSE) {
+	public function render($theme = 'xtheme-blue', $debug = FALSE, $includeStylesheets = TRUE) {
 		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
-			$output = '
+		$output = '';
+		if ($includeStylesheets) {
+			$output .= '
 <link rel="stylesheet" href="' . $baseUri . 'CSS/ext-all-notheme.css" />
 <link rel="stylesheet" href="' . $baseUri . 'CSS/' . $theme . '.css" />';
+		}
 		if ($debug) {
 			$output .= '
 <script type="text/javascript" src="' . $baseUri . 'JavaScript/adapter/ext/ext-base-debug.js"></script>
