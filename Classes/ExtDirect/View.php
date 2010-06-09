@@ -23,13 +23,14 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- * A transparent view that passes on special values to the Ext Direct response.
- * This view is a singleton because it doesn't hold any state itself.
+ * A transparent view that extends JsonView and passes on the prepared array
+ * to the Ext Direct response.
  *
  * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
+ * @scope prototype
  */
-class View implements \F3\FLOW3\MVC\View\ViewInterface {
+class View extends \F3\FLOW3\MVC\View\JsonView {
 
 	/**
 	 * @var \F3\FLOW3\MVC\Controller\ControllerContext
@@ -43,7 +44,9 @@ class View implements \F3\FLOW3\MVC\View\ViewInterface {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function render() {
-		return '';
+		$result = $this->renderArray();
+		$this->controllerContext->getResponse()->setResult($result);
+		$this->controllerContext->getResponse()->setSuccess(TRUE);
 	}
 
 	/**
@@ -55,41 +58,6 @@ class View implements \F3\FLOW3\MVC\View\ViewInterface {
 	 */
 	public function setControllerContext(\F3\FLOW3\MVC\Controller\ControllerContext $controllerContext) {
 		$this->controllerContext = $controllerContext;
-	}
-
-	/**
-	 * Add a variable to $this->variables.
-	 * Can be chained, so $this->view->assign(..., ...)->assign(..., ...); is possible,
-	 *
-	 * @param string $key Key of variable
-	 * @param object $value Value of object
-	 * @return \F3\FLOW3\MVC\View\ViewInterface an instance of $this, to enable chaining.
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
-	 * @api
-	 */
-	public function assign($key, $value) {
-		if ($key === 'result') {
-			// TODO throw up if response is not a Ext Direct response
-			$this->controllerContext->getResponse()->setResult($value);
-		} elseif ($key === 'success') {
-			// TODO throw up if response is not a Ext Direct response
-			$this->controllerContext->getResponse()->setSuccess($value);
-		}
-		return $this;
-	}
-
-	/**
-	 * Add multiple variables in one go.
-	 *
-	 * @param array $values array in the format array(key1 => value1, key2 => value2).
-	 * @return void
-	 * @author Bastian Waidelich <bastian@typo3.org>
-	 * @api
-	 */
-	public function assignMultiple(array $values) {
-		foreach($values as $key => $value) {
-			$this->assign($key, $value);
-		}
 	}
 }
 ?>

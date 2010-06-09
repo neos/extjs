@@ -33,10 +33,18 @@ namespace F3\ExtJS\ViewHelpers\ExtDirect;
 class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
-	 * @inject
 	 * @var \F3\FLOW3\Reflection\ReflectionService
 	 */
-	protected $reflectionService;
+	protected $localReflectionService;
+
+	/**
+	 * Inject a Reflection service
+	 * @param \F3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 */
+	public function injectLocalReflectionService(\F3\FLOW3\Reflection\ReflectionService $reflectionService) {
+		$this->localReflectionService = $reflectionService;
+	}
 
 	/**
 	 * Returns the JavaScript to declare the Ext Direct provider for all
@@ -65,13 +73,13 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 			'namespace' => $namespace,
 			'actions' => array()
 		);
-		$controllerClassNames = $this->reflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
+		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
-			$methodNames = $this->reflectionService->getClassMethodNames($controllerClassName);
+			$methodNames = $this->localReflectionService->getClassMethodNames($controllerClassName);
 			foreach ($methodNames as $methodName) {
-				$methodTagsValues = $this->reflectionService->getMethodTagsValues($controllerClassName, $methodName);
+				$methodTagsValues = $this->localReflectionService->getMethodTagsValues($controllerClassName, $methodName);
 				if (isset($methodTagsValues['extdirect'])) {
-					$methodParameters = $this->reflectionService->getMethodParameters($controllerClassName, $methodName);
+					$methodParameters = $this->localReflectionService->getMethodParameters($controllerClassName, $methodName);
 					$extDirectAction = str_replace('\\', '_', str_replace('F3\\', '', $controllerClassName));
 					$providerConfig['actions'][$extDirectAction][] = array(
 						'name' => substr($methodName, 0, -6),

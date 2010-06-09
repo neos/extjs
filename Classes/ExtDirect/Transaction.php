@@ -157,6 +157,7 @@ class Transaction {
 	 *
 	 * @return array The mapped arguments
 	 * @author Robert Lemke <robert@typo3.org>
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function getArguments() {
 		if ($this->data === array()) {
@@ -171,12 +172,13 @@ class Transaction {
 			// TODO Add checks for parameters
 			foreach ($parameters as $name => $options) {
 				$parameterIndex = $options['position'];
-				$arguments[$name] = $this->data[$parameterIndex];
+				$arguments[$name] = (array)$this->data[$parameterIndex];
 			}
 
 		} else {
 			// TODO Reuse setArgumentsFromRawRequestData from Web/RequestBuilder
 		}
+
 		return $arguments;
 	}
 
