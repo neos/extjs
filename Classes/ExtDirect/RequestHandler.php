@@ -90,16 +90,26 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 
 			$transactionResponse = $this->objectManager->create('F3\ExtJS\ExtDirect\TransactionResponse');
 
-			$this->dispatcher->dispatch($transactionRequest, $transactionResponse);
+			try {
+				$this->dispatcher->dispatch($transactionRequest, $transactionResponse);
+				$results[] = array(
+					'type' => 'rpc',
+					'tid' => $transaction->getTid(),
+					'action' => $transaction->getAction(),
+					'method' => $transaction->getMethod(),
+					'result' => $transactionResponse->getResult(),
+					'success' => $transactionResponse->getSuccess()
+				);
+			} catch(\Exception $e) {
+				$results[] = array(
+					'type' => 'exception',
+					'tid' => $transaction->getTid(),
+					'message' => $e->getMessage(),
+					'where' => $e->getTraceAsString()
+				);
+			}
 
-			$results[] = array(
-				'type' => 'rpc',
-				'tid' => $transaction->getTid(),
-				'action' => $transaction->getAction(),
-				'method' => $transaction->getMethod(),
-				'result' => $transactionResponse->getResult(),
-				'success' => $transactionResponse->getSuccess()
-			);
+			
 		}
 
 		$this->sendResponse($results, $extDirectRequest);
