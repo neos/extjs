@@ -3,7 +3,7 @@ declare(ENCODING = 'utf-8');
 namespace F3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FFLOW3 package "ExtJS".                     *
+ * This script belongs to the FLOW3 package "ExtJS".                      *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License as published by the *
@@ -23,42 +23,20 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- * A transparent view that extends JsonView and passes on the prepared array
- * to the Ext Direct response.
+ * An exception handler that's used to handle exception in Ext Direct dispatched
+ * requests.
  *
  * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
- * @scope prototype
  */
-class View extends \F3\FLOW3\MVC\View\JsonView {
-
+class ExceptionHandler extends \F3\FLOW3\Error\AbstractExceptionHandler {
 	/**
-	 * @var \F3\FLOW3\MVC\Controller\ControllerContext
-	 */
-	protected $controllerContext;
-
-	/**
-	 * Renders the Ext Direct view by delegating to the JsonView
-	 * for rendering a serializable array.
+	 * This constructor does nothing
 	 *
-	 * @return string An empty string
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function render() {
-		$result = $this->renderArray();
-		$this->controllerContext->getResponse()->setResult($result);
-		$this->controllerContext->getResponse()->setSuccess(TRUE);
-	}
-
-	/**
-	 * Sets the current controller context
-	 *
-	 * @param \F3\FLOW3\MVC\Controller\ControllerContext $controllerContext
-	 * @return void
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
-	 */
-	public function setControllerContext(\F3\FLOW3\MVC\Controller\ControllerContext $controllerContext) {
-		$this->controllerContext = $controllerContext;
+	public function __construct() {
 	}
 }
+
 ?>

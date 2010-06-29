@@ -51,23 +51,50 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	protected $requestBuilder;
 
 	/**
+	 * @var \F3\ExtJS\ExtDirect\ExceptionHandler
+	 */
+	protected $exceptionHandler;
+
+	/**
+	 * Wether to expose exception information in an ext direct response
+	 * @var boolean
+	 */
+	protected $exposeExceptionInformation = FALSE;
+
+	/**
 	 * Constructs the Ext Direct Request Handler
 	 *
 	 * @param \F3\FLOW3\Object\ObjectManagerInterface $objectManager A reference to the object factory
 	 * @param \F3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
 	 * @param \F3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
 	 * @param \F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder The Ext Direct request builder
+	 * @param \F3\FLOW3\Configuration\ConfigurationManager $configurationManager A reference to the configuration manager
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function __construct(
 			\F3\FLOW3\Object\ObjectManagerInterface $objectManager,
 			\F3\FLOW3\Utility\Environment $utilityEnvironment,
 			\F3\FLOW3\MVC\Dispatcher $dispatcher,
-			\F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder) {
+			\F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder,
+			\F3\ExtJS\ExtDirect\ExceptionHandler $exceptionHandler) {
 		$this->objectManager = $objectManager;
 		$this->environment = $utilityEnvironment;
 		$this->dispatcher = $dispatcher;
 		$this->requestBuilder = $requestBuilder;
+		$this->exceptionHandler = $exceptionHandler;
+	}
+
+	/**
+	 * Inject the settings
+	 *
+	 * @param array $settings The settings
+	 * @return void
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 */
+	public function injectSettings(array $settings) {
+		if (!isset($settings['ExtDirect'])) return;
+
+		$this->exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
 	}
 
 	/**
@@ -75,20 +102,15 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	 *
 	 * @return void
 	 * @author Robert Lemke <robert@typo3.org>
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequest() {
 		$extDirectRequest = $this->requestBuilder->build();
 
 		$results = array();
 		foreach ($extDirectRequest->getTransactions() as $transaction) {
-
-			$transactionRequest = $this->objectManager->create('F3\FLOW3\MVC\Web\Request');
-			$transactionRequest->setControllerObjectName($transaction->getControllerObjectName());
-			$transactionRequest->setControllerActionName($transaction->getMethod());
-			$transactionRequest->setFormat('extdirect');
-			$transactionRequest->setArguments($transaction->getArguments());
-
-			$transactionResponse = $this->objectManager->create('F3\ExtJS\ExtDirect\TransactionResponse');
+			$transactionRequest = $transaction->buildRequest();
+			$transactionResponse = $transaction->buildResponse();
 
 			try {
 				$this->dispatcher->dispatch($transactionRequest, $transactionResponse);
@@ -97,19 +119,19 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 					'tid' => $transaction->getTid(),
 					'action' => $transaction->getAction(),
 					'method' => $transaction->getMethod(),
-					'result' => $transactionResponse->getResult(),
-					'success' => $transactionResponse->getSuccess()
+					'result' => $transactionResponse->getResult()
 				);
-			} catch(\Exception $e) {
+			} catch(\Exception $exception) {
+				$exceptionMessage = $this->exposeExceptionInformation ? $exception->getMessage() : 'An internal error occured';
+				$exceptionWhere = $this->exposeExceptionInformation ? $exception->getTraceAsString() : '';
 				$results[] = array(
 					'type' => 'exception',
 					'tid' => $transaction->getTid(),
-					'message' => $e->getMessage(),
-					'where' => $e->getTraceAsString()
+					'message' => $exceptionMessage,
+					'where' => $exceptionWhere
 				);
+				$this->exceptionHandler->handleException($exception);
 			}
-
-			
 		}
 
 		$this->sendResponse($results, $extDirectRequest);

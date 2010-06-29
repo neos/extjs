@@ -25,7 +25,7 @@ namespace F3\ExtJS\ExtDirect;
 /**
  * An Ext Direct transaction
  *
- * @version $Id: EmptyView.php 2813 2009-07-16 14:02:34Z k-fish $
+ * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */
@@ -36,6 +36,12 @@ class Transaction {
 	 * @var \F3\FLOW3\Reflection\ReflectionService
 	 */
 	protected $reflectionService;
+
+	/**
+	 * @inject
+	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 */
+	protected $objectManager;
 
 	/**
 	 * The direct request this transaction belongs to
@@ -88,6 +94,31 @@ class Transaction {
 		$this->method = $method;
 		$this->data = $data;
 		$this->tid = $tid;
+	}
+
+	/**
+	 * Build a web request for dispatching this Ext Direct transaction
+	 *
+	 * @return \F3\FLOW3\MVC\Web\Request A web request for this transaction
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 */
+	public function buildRequest() {
+		$request = $this->objectManager->create('F3\FLOW3\MVC\Web\Request');
+		$request->setControllerObjectName($this->getControllerObjectName());
+		$request->setControllerActionName($this->getMethod());
+		$request->setFormat('extdirect');
+		$request->setArguments($this->getArguments());
+		return $request;
+	}
+
+	/**
+	 * Build a response for dispatching this Ext Direct transaction
+	 *
+	 * @return \F3\ExtJS\ExtDirect\TransactionResponse A response for dispatching this transaction
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 */
+	public function buildResponse() {
+		return $this->objectManager->create('F3\ExtJS\ExtDirect\TransactionResponse');
 	}
 
 	/**
