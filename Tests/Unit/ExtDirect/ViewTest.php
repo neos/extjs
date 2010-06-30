@@ -3,7 +3,7 @@ declare(ENCODING = 'utf-8');
 namespace F3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the FFLOW3 package "ExtJS".                     *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License as published by the *
@@ -23,49 +23,46 @@ namespace F3\ExtJS\ExtDirect;
  *                                                                        */
 
 /**
- * A transparent view that extends JsonView and passes on the prepared array
- * to the Ext Direct response.
+ * Testcase for the ExtDirect View
  *
  * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
- * @scope prototype
  */
-class View extends \F3\FLOW3\MVC\View\JsonView {
-	/**
-	 * Renders the Ext Direct view by delegating to the JsonView
-	 * for rendering a serializable array.
-	 *
-	 * @return string An empty string
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
-	 */
-	public function render() {
-		$result = $this->renderArray();
-		$this->controllerContext->getResponse()->setResult($result);
-		$this->controllerContext->getResponse()->setSuccess(TRUE);
-	}
+class ViewTest extends \F3\Testing\BaseTestCase {
 
 	/**
-	 * Assigns errors to the view and converts them to a format that Ext JS
-	 * understands.
-	 *
-	 * @param array $errors Errors e.g. from mapping results
+	 * @test
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function assignErrors(array $errors) {
-		$result = array();
-		foreach ($errors as $argumentName => $argumentError) {
-			foreach ($argumentError->getErrors() as $propertyName => $propertyError) {
-				$message = '';
-				foreach ($propertyError->getErrors() as $error) {
-					$message .= $error->getMessage();
-				}
-				$result[$propertyName] = $message;
-			}
-		}
-		$this->assign('value', array(
-			'errors' => $result,
+	public function assignErrorsConvertsErrorsToExtJSFormat() {
+		$propertyError = new \F3\FLOW3\Validation\PropertyError('title');
+		$propertyError->addErrors(array(new \F3\FLOW3\Validation\Error('Some error', 12345678)));
+
+		$argumentError = new \F3\FLOW3\MVC\Controller\ArgumentError('page');
+		$argumentError->addErrors(array('title' => $propertyError));
+
+		$errors = array('page' => $argumentError);
+
+		$expected = array(
+			'errors' => array(
+				'title' => 'Some error'
+			),
 			'success' => FALSE
-		));
+		);
+		$mockResponse = $this->getMock('F3\ExtJS\ExtDirect\TransactionResponse');
+		$mockResponse->expects($this->atLeastOnce())->method('setResult')->with($expected);
+
+		$mockControllerContext = $this->getMock('F3\FLOW3\MVC\Controller\ControllerContext', array('getResponse'), array(), '', FALSE);
+		$mockControllerContext->expects($this->any())->method('getResponse')->will($this->returnValue($mockResponse));
+
+		$view = $this->getMock('F3\ExtJS\ExtDirect\View', array('loadConfigurationFromYamlFile'));
+		$view->setControllerContext($mockControllerContext);
+
+		$view->expects($this->any())->method('loadConfigurationFromYamlFile')->will($this->returnValue(array()));
+
+		$view->assignErrors($errors);
+
+		$view->render();
 	}
 }
 ?>
