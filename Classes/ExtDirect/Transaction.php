@@ -3,7 +3,7 @@ declare(ENCODING = 'utf-8');
 namespace F3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FFLOW3 package "ExtJS".                     *
+ * This script belongs to the FLOW3 package "ExtJS".                      *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License as published by the *
