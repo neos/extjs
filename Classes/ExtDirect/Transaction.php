@@ -203,7 +203,9 @@ class Transaction {
 			// TODO Add checks for parameters
 			foreach ($parameters as $name => $options) {
 				$parameterIndex = $options['position'];
-				$arguments[$name] = (array)$this->data[$parameterIndex];
+				if (isset($this->data[$parameterIndex])) {
+					$arguments[$name] = (array)$this->data[$parameterIndex];
+				}
 			}
 
 		} else {

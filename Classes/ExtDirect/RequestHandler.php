@@ -67,7 +67,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	 * @param \F3\FLOW3\Object\ObjectManagerInterface $objectManager A reference to the object factory
 	 * @param \F3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
 	 * @param \F3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
-	 * @param \F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder The Ext Direct request builder
+	 * @param \F3\ExtJS\ExtDirect\ExceptionHandler $exceptionHandler
 	 * @param \F3\FLOW3\Configuration\ConfigurationManager $configurationManager A reference to the configuration manager
 	 * @author Robert Lemke <robert@typo3.org>
 	 */

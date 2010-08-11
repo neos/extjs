@@ -50,8 +50,8 @@ class RequestBuilder {
 	public function build() {
 		$postArguments = $this->environment->getRawPostArguments();
 		if (isset($postArguments['extAction'])) {
-			throw new \Exception('Not implemented');
-#			$request = $this->buildFormPostRequest($postArguments);
+			throw new \Exception('Form Post Request building is not yet implemented.', 1281379502);
+			$request = $this->buildFormPostRequest($postArguments);
 		} else {
 			$request = $this->buildJsonRequest();
 		}
@@ -59,7 +59,13 @@ class RequestBuilder {
 	}
 
 	/**
-	 * @return \F3\ExtJS\ExtDirect\Request
+	 * Builds a Json Ext Direct request by reading the transaction data from
+	 * standard input.
+	 *
+	 * @return \F3\ExtJS\ExtDirect\Request The Ext Direct request object
+	 * @throws \F3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	protected function buildJsonRequest() {
 		$transactionDatas = json_decode(file_get_contents('php://input'));
@@ -84,6 +90,11 @@ class RequestBuilder {
 	}
 
 	/**
+	 * Builds a Form Post Ext Direct Request
+	 *
+	 * @return \F3\ExtJS\ExtDirect\Request The Ext Direct request object
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 * @author Robert Lemke <robert@typo3.org>
 	 * @todo Well... make it work, eh?
 	 */
 	protected function buildFormPostRequest() {

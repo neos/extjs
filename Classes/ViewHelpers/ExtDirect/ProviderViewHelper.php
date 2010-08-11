@@ -38,8 +38,13 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	protected $localReflectionService;
 
 	/**
-	 * Inject a Reflection service
+	 * Inject the Reflection service
+	 *
+	 * A _private_ property "reflectionService" already exists in the AbstractViewHelper,
+	 * therefore we need to switch to another property name.
+	 *
 	 * @param \F3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
+	 * @return void
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function injectLocalReflectionService(\F3\FLOW3\Reflection\ReflectionService $reflectionService) {
@@ -80,10 +85,17 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 				$methodTagsValues = $this->localReflectionService->getMethodTagsValues($controllerClassName, $methodName);
 				if (isset($methodTagsValues['extdirect'])) {
 					$methodParameters = $this->localReflectionService->getMethodParameters($controllerClassName, $methodName);
+					$requiredMethodParametersCount = 0;
+					foreach ($methodParameters as $methodParameter) {
+						if ($methodParameter['optional'] === TRUE) {
+							break;
+						}
+						$requiredMethodParametersCount ++;
+					}
 					$extDirectAction = str_replace('\\', '_', str_replace('F3\\', '', $controllerClassName));
 					$providerConfig['actions'][$extDirectAction][] = array(
 						'name' => substr($methodName, 0, -6),
-						'len' => count($methodParameters)
+						'len' => count($requiredMethodParametersCount)
 					);
 				}
 			}

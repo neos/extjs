@@ -116,7 +116,7 @@ class Request {
 	 * @return void
 	 */
 	public function setFileUpload($fileUpload) {
-		$this->fileUpload = $fileUpload;
+		$this->fileUpload = $fileUpload ? TRUE : FALSE;
 	}
 
 }
