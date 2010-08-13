@@ -25,7 +25,6 @@ namespace F3\ExtJS\ExtDirect;
 /**
  * Testcase for the ExtDirect View
  *
- * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class ViewTest extends \F3\Testing\BaseTestCase {

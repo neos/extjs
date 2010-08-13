@@ -25,7 +25,6 @@ namespace F3\ExtJS\ExtDirect;
 /**
  * A Ext Direct specific response implementation with raw content for json encodable results
  *
- * @version $Id: Response.php 3345 2009-10-22 17:22:44Z k-fish $
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */

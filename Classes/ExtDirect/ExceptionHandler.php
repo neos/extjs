@@ -26,7 +26,6 @@ namespace F3\ExtJS\ExtDirect;
  * An exception handler that's used to handle exception in Ext Direct dispatched
  * requests.
  *
- * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class ExceptionHandler extends \F3\FLOW3\Error\AbstractExceptionHandler {

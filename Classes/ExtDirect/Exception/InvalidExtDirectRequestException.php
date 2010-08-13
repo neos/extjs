@@ -25,7 +25,6 @@ namespace F3\ExtJS\ExtDirect\Exception;
 /**
  * An exception for an invalid Ext Direct request
  *
- * @version $Id: Exception.php 3345 2009-10-22 17:22:44Z k-fish $
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class InvalidExtDirectRequestException extends \F3\FLOW3\Exception {

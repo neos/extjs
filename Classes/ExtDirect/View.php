@@ -26,7 +26,6 @@ namespace F3\ExtJS\ExtDirect;
  * A transparent view that extends JsonView and passes on the prepared array
  * to the Ext Direct response.
  *
- * @version $Id$
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */

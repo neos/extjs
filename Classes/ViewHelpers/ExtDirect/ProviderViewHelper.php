@@ -25,7 +25,6 @@ namespace F3\ExtJS\ViewHelpers\ExtDirect;
 /**
  * Ext Direct Provider view helper
  *
- * @version $Id: IncludeViewHelper.php 3736 2010-01-20 15:47:11Z k-fish $
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  * @api
