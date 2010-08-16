@@ -94,7 +94,7 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 					$extDirectAction = str_replace('\\', '_', str_replace('F3\\', '', $controllerClassName));
 					$providerConfig['actions'][$extDirectAction][] = array(
 						'name' => substr($methodName, 0, -6),
-						'len' => count($requiredMethodParametersCount)
+						'len' => $requiredMethodParametersCount
 					);
 				}
 			}
