@@ -203,7 +203,7 @@ class Transaction {
 			foreach ($parameters as $name => $options) {
 				$parameterIndex = $options['position'];
 				if (isset($this->data[$parameterIndex])) {
-					$arguments[$name] = (array)$this->data[$parameterIndex];
+					$arguments[$name] = $this->convertObjectToArray($this->data[$parameterIndex]);
 				}
 			}
 
@@ -214,6 +214,15 @@ class Transaction {
 		return $arguments;
 	}
 
-
+	/**
+	 * Convert an object to an array recursively
+	 *
+	 * @param stdClass $object The object to convert
+	 * @return array The object converted to an array
+	 * @author Christopher Hlubek <hlubek@networkteam.com>
+	 */
+	protected function convertObjectToArray($object) {
+		return json_decode(json_encode($object), TRUE);
+	}
 }
 ?>
