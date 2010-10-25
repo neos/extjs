@@ -1,6 +1,6 @@
 <?php
 declare(ENCODING = 'utf-8');
-namespace F3\ExtJS\ExtDirect;
+namespace F3\ExtJS\Tests\Unit\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
