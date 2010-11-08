@@ -42,6 +42,18 @@ class RequestBuilder {
 	protected $environment;
 
 	/**
+	 * @inject
+	 * @var \F3\FLOW3\Configuration\ConfigurationManager
+	 */
+	protected $configurationManager;
+
+	/**
+	 * @inject
+	 * @var \F3\FLOW3\MVC\Web\Routing\RouterInterface
+	 */
+	protected $router;
+
+	/**
 	 * Builds an Ext Direct request
 	 *
 	 * @return \F3\ExtJS\ExtDirect\Request The built request
@@ -54,6 +66,11 @@ class RequestBuilder {
 		} else {
 			$request = $this->buildJsonRequest();
 		}
+
+			// Explicitly configure the router like the original RequestBuilder
+		$routesConfiguration = $this->configurationManager->getConfiguration(\F3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
+		$this->router->setRoutesConfiguration($routesConfiguration);
+
 		return $request;
 	}
 
