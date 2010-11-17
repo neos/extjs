@@ -50,12 +50,12 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	protected $requestBuilder;
 
 	/**
-	 * @var \F3\ExtJS\ExtDirect\ExceptionHandler
+	 * @var \F3\FLOW3\Log\SystemLoggerInterface
 	 */
-	protected $exceptionHandler;
+	protected $systemLogger;
 
 	/**
-	 * Wether to expose exception information in an ext direct response
+	 * Whether to expose exception information in an ExtDirect response
 	 * @var boolean
 	 */
 	protected $exposeExceptionInformation = FALSE;
@@ -67,7 +67,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	 * @param \F3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
 	 * @param \F3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
 	 * @param \F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder
-	 * @param \F3\ExtJS\ExtDirect\ExceptionHandler $exceptionHandler
+	 * @param \F3\FLOW3\Log\SystemLoggerInterface $systemLogger
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function __construct(
@@ -75,12 +75,12 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 			\F3\FLOW3\Utility\Environment $utilityEnvironment,
 			\F3\FLOW3\MVC\Dispatcher $dispatcher,
 			\F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder,
-			\F3\ExtJS\ExtDirect\ExceptionHandler $exceptionHandler) {
+			\F3\FLOW3\Log\SystemLoggerInterface $systemLogger) {
 		$this->objectManager = $objectManager;
 		$this->environment = $utilityEnvironment;
 		$this->dispatcher = $dispatcher;
 		$this->requestBuilder = $requestBuilder;
-		$this->exceptionHandler = $exceptionHandler;
+		$this->systemLogger = $systemLogger;
 	}
 
 	/**
@@ -121,6 +121,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 					'result' => $transactionResponse->getResult()
 				);
 			} catch(\Exception $exception) {
+				$this->systemLogger->logException($exception);
 				$exceptionMessage = $this->exposeExceptionInformation ? $exception->getMessage() : 'An internal error occured';
 				$exceptionWhere = $this->exposeExceptionInformation ? $exception->getTraceAsString() : '';
 				$results[] = array(
@@ -129,7 +130,6 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 					'message' => $exceptionMessage,
 					'where' => $exceptionWhere
 				);
-				$this->exceptionHandler->handleException($exception);
 			}
 		}
 
