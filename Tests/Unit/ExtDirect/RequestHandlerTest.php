@@ -40,7 +40,7 @@ class RequestHandlerTest extends \F3\Testing\BaseTestCase {
 
 		$requestHandler = $this->getAccessibleMock('F3\ExtJS\ExtDirect\RequestHandler', array('dummy'), array(), '', FALSE);
 		$requestHandler->_set('environment', $mockEnvironment);
-		
+
 		$this->assertFalse($requestHandler->canHandleRequest());
 		$this->assertTrue($requestHandler->canHandleRequest());
 	}
@@ -49,11 +49,12 @@ class RequestHandlerTest extends \F3\Testing\BaseTestCase {
 	 * @test
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function handleRequestPassesExceptionsToAnExceptionHandler() {
+	public function handleRequestCatchesAndLogsExceptionsAndReturnsThemInTheTransaction() {
+		$mockSystemLogger = $this->getMock('F3\FLOW3\Log\SystemLoggerInterface');
+
 		$mockRequest = $this->getMock('F3\ExtJS\ExtDirect\Request', array('getTransactions'));
 
 		$mockTransactionRequest = $this->getMock('F3\FLOW3\MVC\Web\Request');
-		$mockTransactionResponse = $this->getMock('F3\ExtJS\ExtDirect\TransactionResponse');
 
 		$mockTransaction = $this->getMock('F3\ExtJS\ExtDirect\Transaction', array('buildRequest', 'buildResponse'), array($mockRequest, 'someAction', 'someMethod', array(), 42));
 		$mockTransaction->expects($this->any())->method('buildRequest')->will($this->returnValue($mockTransactionRequest));
@@ -68,15 +69,12 @@ class RequestHandlerTest extends \F3\Testing\BaseTestCase {
 		$mockDispatcher = $this->getMock('F3\FLOW3\MVC\Dispatcher', array('dispatch'), array(), '', FALSE);
 		$mockDispatcher->expects($this->any())->method('dispatch')->will($this->throwException($mockException));
 
-		$mockExceptionHandler = $this->getMock('F3\ExtJS\ExtDirect\ExceptionHandler', array(), array(), '', FALSE);
-		// FIXME out of memory!
-		// $mockExceptionHandler->expects($this->once())->method('handleException')->with($mockException);
-		$mockExceptionHandler->expects($this->once())->method('handleException');
+		$mockSystemLogger->expects($this->once())->method('logException');
 
 		$requestHandler = $this->getAccessibleMock('F3\ExtJS\ExtDirect\RequestHandler', array('sendResponse'), array(), '', FALSE);
 		$requestHandler->_set('requestBuilder', $mockRequestBuilder);
 		$requestHandler->_set('dispatcher', $mockDispatcher);
-		$requestHandler->_set('exceptionHandler', $mockExceptionHandler);
+		$requestHandler->_set('systemLogger', $mockSystemLogger);
 		$requestHandler->handleRequest();
 	}
 }
