@@ -120,7 +120,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 					'method' => $transaction->getMethod(),
 					'result' => $transactionResponse->getResult()
 				);
-			} catch(\Exception $exception) {
+			} catch (\Exception $exception) {
 				$this->systemLogger->logException($exception);
 				$exceptionMessage = $this->exposeExceptionInformation ? $exception->getMessage() : 'An internal error occured';
 				$exceptionWhere = $this->exposeExceptionInformation ? $exception->getTraceAsString() : '';
