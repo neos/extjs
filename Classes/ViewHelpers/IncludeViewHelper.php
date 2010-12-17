@@ -38,6 +38,12 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	protected $resourcePublisher;
 
 	/**
+	 * @inject
+	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 */
+	protected $objectManager;
+
+	/**
 	 * Returns the HTML needed to include ExtJS, that is, CSS and JS includes.
 	 *
 	 * = Examples =
@@ -61,7 +67,10 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @author Karsten Dambekalns <karsten@typo3.org>
 	 * @api
 	 */
-	public function render($theme = 'xtheme-blue', $debug = FALSE, $includeStylesheets = TRUE) {
+	public function render($theme = 'xtheme-blue', $debug = NULL, $includeStylesheets = TRUE) {
+		if ($debug === NULL) {
+			$debug = ($this->objectManager->getContext() === 'Development') ?: FALSE;
+		}
 		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
 		$output = '';
 		if ($includeStylesheets) {
