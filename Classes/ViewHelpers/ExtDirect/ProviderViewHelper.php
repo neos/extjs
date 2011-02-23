@@ -79,7 +79,7 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 		);
 		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
-			$methodNames = $this->localReflectionService->getClassMethodNames($controllerClassName);
+			$methodNames = get_class_methods($controllerClassName);
 			foreach ($methodNames as $methodName) {
 				$methodTagsValues = $this->localReflectionService->getMethodTagsValues($controllerClassName, $methodName);
 				if (isset($methodTagsValues['extdirect'])) {
