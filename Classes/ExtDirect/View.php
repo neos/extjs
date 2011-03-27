@@ -47,22 +47,21 @@ class View extends \F3\FLOW3\MVC\View\JsonView {
 	 * Assigns errors to the view and converts them to a format that Ext JS
 	 * understands.
 	 *
-	 * @param array $errors Errors e.g. from mapping results
+	 * @param \F3\FLOW3\Error\Result $result Errors e.g. from mapping results
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function assignErrors(array $errors) {
-		$result = array();
-		foreach ($errors as $argumentName => $argumentError) {
-			foreach ($argumentError->getErrors() as $propertyName => $propertyError) {
-				$message = '';
-				foreach ($propertyError->getErrors() as $error) {
-					$message .= $error->getMessage();
-				}
-				$result[$propertyName] = $message;
+	public function assignErrors(\F3\FLOW3\Error\Result $result) {
+		$errors = $result->getFlattenedErrors();
+		$output = array();
+		foreach ($errors as $propertyPath => $propertyErrors) {
+			$message = '';
+			foreach ($propertyErrors as $propertyError) {
+				$message .= $propertyError->getMessage();
 			}
+			$output[$propertyPath] = $message;
 		}
 		$this->assign('value', array(
-			'errors' => $result,
+			'errors' => $output,
 			'success' => FALSE
 		));
 	}

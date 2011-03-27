@@ -34,13 +34,10 @@ class ViewTest extends \F3\FLOW3\Tests\UnitTestCase {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function assignErrorsConvertsErrorsToExtJSFormat() {
-		$propertyError = new \F3\FLOW3\Validation\PropertyError('title');
-		$propertyError->addErrors(array(new \F3\FLOW3\Validation\Error('Some error', 12345678)));
+		$propertyError = new \F3\FLOW3\Error\Error('Some error', 12345678);
 
-		$argumentError = new \F3\FLOW3\MVC\Controller\ArgumentError('page');
-		$argumentError->addErrors(array('title' => $propertyError));
-
-		$errors = array('page' => $argumentError);
+		$errors = new \F3\FLOW3\Error\Result();
+		$errors->forProperty('title')->addError($propertyError);
 
 		$expected = array(
 			'errors' => array(
