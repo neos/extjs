@@ -51,6 +51,17 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	}
 
 	/**
+	 * Injects the security context
+	 *
+	 * @param \F3\FLOW3\Security\Context $securityContext The security context
+	 * @return void
+	 * @author Andreas Förthner <andreas.foerthner@netlogix.de>
+	 */
+	public function injectSecurityContext(\F3\FLOW3\Security\Context $securityContext) {
+		$this->securityContext = $securityContext;
+	}
+
+	/**
 	 * Returns the JavaScript to declare the Ext Direct provider for all
 	 * controller actions that are annotated with @extdirect
 	 *
@@ -72,7 +83,7 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 */
 	public function render($namespace = 'F3') {
 		$providerConfig = array(
-			'url' => '?F3_ExtJS_ExtDirectRequest=1',
+			'url' => '?F3_ExtJS_ExtDirectRequest=1&FLOW3-CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
 			'type' => 'remoting',
 			'namespace' => $namespace,
 			'actions' => array()
