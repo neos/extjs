@@ -83,7 +83,7 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 */
 	public function render($namespace = 'F3') {
 		$providerConfig = array(
-			'url' => '?F3_ExtJS_ExtDirectRequest=1&FLOW3-CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
+			'url' => '?F3_ExtJS_ExtDirectRequest=1&__CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
 			'type' => 'remoting',
 			'namespace' => $namespace,
 			'actions' => array()
