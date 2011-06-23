@@ -56,43 +56,37 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * use ExtJS.
 	 *
 	 * <code title="Use a specific theme">
-	 * <ext:include theme="xtheme-gray"/>
+	 * <ext:include theme="gray"/>
 	 * </code>
 	 *
-	 * @param string $theme The theme to include, simply the name of the CSS
+	 * @param string $theme The theme to include. The part behind ext-all- in the filename.
 	 * @param boolean $debug Whether to use the debug version of ExtJS
 	 * @param boolean $includeStylesheets Include ExtJS CSS files if true
 	 * @return string HTML needed to include ExtJS
 	 * @author Karsten Dambekalns <karsten@typo3.org>
+	 * @author Pascal Jungblut <typo3@pascalj.com>
 	 * @api
 	 */
-	public function render($theme = 'xtheme-blue', $debug = NULL, $includeStylesheets = TRUE) {
+	public function render($theme = '', $debug = NULL, $includeStylesheets = TRUE) {
 		if ($debug === NULL) {
 			$debug = ($this->objectManager->getContext() === 'Development') ?: FALSE;
 		}
 		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
 		$output = '';
 		if ($includeStylesheets) {
+			if ($theme != '') {
+				$theme = '-' . $theme;
+			}
 			$output .= '
-<link rel="stylesheet" href="' . $baseUri . 'CSS/ext-all-notheme.css" />
-<link rel="stylesheet" href="' . $baseUri . 'CSS/' . $theme . '.css" />';
+<link rel="stylesheet" href="' . $baseUri . 'CSS/ext-all' . $theme . '.css" />';
 		}
 		if ($debug) {
 			$output .= '
-<script type="text/javascript" src="' . $baseUri . 'JavaScript/adapter/ext/ext-base-debug.js"></script>
 <script type="text/javascript" src="' . $baseUri . 'JavaScript/ext-all-debug.js"></script>';
 		} else {
 			$output .= '
-<script type="text/javascript" src="' . $baseUri . 'JavaScript/adapter/ext/ext-base.js"></script>
 <script type="text/javascript" src="' . $baseUri . 'JavaScript/ext-all.js"></script>';
 		}
-		$output .= '
-<script type="text/javascript">
-	Ext.BLANK_IMAGE_URL = \'' . $baseUri . 'images/default/s.gif\';
-	Ext.FlashComponent.EXPRESS_INSTALL_URL = \'' . $baseUri . 'Flash/expressinstall.swf\';
-	Ext.chart.Chart.CHART_URL = \'' . $baseUri . 'Flash/chart.swf\';
-</script>
-';
 
 		return $output;
 	}
