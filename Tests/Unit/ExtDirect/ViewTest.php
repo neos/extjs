@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\Tests\Unit\ExtDirect;
+namespace TYPO3\ExtJS\Tests\Unit\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -26,16 +26,16 @@ namespace F3\ExtJS\Tests\Unit\ExtDirect;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class ViewTest extends \F3\FLOW3\Tests\UnitTestCase {
+class ViewTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @test
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function assignErrorsConvertsErrorsToExtJSFormat() {
-		$propertyError = new \F3\FLOW3\Error\Error('Some error', 12345678);
+		$propertyError = new \TYPO3\FLOW3\Error\Error('Some error', 12345678);
 
-		$errors = new \F3\FLOW3\Error\Result();
+		$errors = new \TYPO3\FLOW3\Error\Result();
 		$errors->forProperty('title')->addError($propertyError);
 
 		$expected = array(
@@ -44,13 +44,13 @@ class ViewTest extends \F3\FLOW3\Tests\UnitTestCase {
 			),
 			'success' => FALSE
 		);
-		$mockResponse = $this->getMock('F3\ExtJS\ExtDirect\TransactionResponse');
+		$mockResponse = $this->getMock('TYPO3\ExtJS\ExtDirect\TransactionResponse');
 		$mockResponse->expects($this->atLeastOnce())->method('setResult')->with($expected);
 
-		$mockControllerContext = $this->getMock('F3\FLOW3\MVC\Controller\ControllerContext', array('getResponse'), array(), '', FALSE);
+		$mockControllerContext = $this->getMock('TYPO3\FLOW3\MVC\Controller\ControllerContext', array('getResponse'), array(), '', FALSE);
 		$mockControllerContext->expects($this->any())->method('getResponse')->will($this->returnValue($mockResponse));
 
-		$view = $this->getMock('F3\ExtJS\ExtDirect\View', array('loadConfigurationFromYamlFile'));
+		$view = $this->getMock('TYPO3\ExtJS\ExtDirect\View', array('loadConfigurationFromYamlFile'));
 		$view->setControllerContext($mockControllerContext);
 
 		$view->expects($this->any())->method('loadConfigurationFromYamlFile')->will($this->returnValue(array()));

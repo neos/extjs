@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\Tests\Unit\ExtDirect;
+namespace TYPO3\ExtJS\Tests\Unit\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -26,18 +26,18 @@ namespace F3\ExtJS\Tests\Unit\ExtDirect;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class RequestHandlerTest extends \F3\FLOW3\Tests\UnitTestCase {
+class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @test
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function canHandleRequestReturnsTrueIfTheSapiTypeIsWebAndAnExtDirectGetParameterIsSent() {
-		$mockEnvironment = $this->getMock('F3\FLOW3\Utility\Environment', array(), array(), '', FALSE);
+		$mockEnvironment = $this->getMock('TYPO3\FLOW3\Utility\Environment', array(), array(), '', FALSE);
 		$mockEnvironment->expects($this->at(0))->method('getRawGetArguments')->will($this->returnValue(array('foo' => 'bar', 'baz' => 'quux')));
-		$mockEnvironment->expects($this->at(1))->method('getRawGetArguments')->will($this->returnValue(array('foo' => 'bar', 'F3_ExtJS_ExtDirectRequest' => '1')));
+		$mockEnvironment->expects($this->at(1))->method('getRawGetArguments')->will($this->returnValue(array('foo' => 'bar', 'TYPO3_ExtJS_ExtDirectRequest' => '1')));
 
-		$requestHandler = $this->getAccessibleMock('F3\ExtJS\ExtDirect\RequestHandler', array('dummy'), array(), '', FALSE);
+		$requestHandler = $this->getAccessibleMock('TYPO3\ExtJS\ExtDirect\RequestHandler', array('dummy'), array(), '', FALSE);
 		$requestHandler->_set('environment', $mockEnvironment);
 
 		$this->assertFalse($requestHandler->canHandleRequest());
@@ -49,28 +49,28 @@ class RequestHandlerTest extends \F3\FLOW3\Tests\UnitTestCase {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequestCatchesAndLogsExceptionsAndReturnsThemInTheTransaction() {
-		$mockSystemLogger = $this->getMock('F3\FLOW3\Log\SystemLoggerInterface');
+		$mockSystemLogger = $this->getMock('TYPO3\FLOW3\Log\SystemLoggerInterface');
 
-		$mockRequest = $this->getMock('F3\ExtJS\ExtDirect\Request', array('getTransactions'));
+		$mockRequest = $this->getMock('TYPO3\ExtJS\ExtDirect\Request', array('getTransactions'));
 
-		$mockTransactionRequest = $this->getMock('F3\FLOW3\MVC\Web\Request');
+		$mockTransactionRequest = $this->getMock('TYPO3\FLOW3\MVC\Web\Request');
 
-		$mockTransaction = $this->getMock('F3\ExtJS\ExtDirect\Transaction', array('buildRequest', 'buildResponse'), array($mockRequest, 'someAction', 'someMethod', array(), 42));
+		$mockTransaction = $this->getMock('TYPO3\ExtJS\ExtDirect\Transaction', array('buildRequest', 'buildResponse'), array($mockRequest, 'someAction', 'someMethod', array(), 42));
 		$mockTransaction->expects($this->any())->method('buildRequest')->will($this->returnValue($mockTransactionRequest));
 
 		$mockRequest->expects($this->any())->method('getTransactions')->will($this->returnValue(array($mockTransaction)));
 
-		$mockRequestBuilder = $this->getMock('F3\ExtJS\ExtDirect\RequestBuilder', array('build'));
+		$mockRequestBuilder = $this->getMock('TYPO3\ExtJS\ExtDirect\RequestBuilder', array('build'));
 		$mockRequestBuilder->expects($this->any())->method('build')->will($this->returnValue($mockRequest));
 
 		$mockException = $this->getMock('Exception');
 
-		$mockDispatcher = $this->getMock('F3\FLOW3\MVC\Dispatcher', array('dispatch'), array(), '', FALSE);
+		$mockDispatcher = $this->getMock('TYPO3\FLOW3\MVC\Dispatcher', array('dispatch'), array(), '', FALSE);
 		$mockDispatcher->expects($this->any())->method('dispatch')->will($this->throwException($mockException));
 
 		$mockSystemLogger->expects($this->once())->method('logException');
 
-		$requestHandler = $this->getAccessibleMock('F3\ExtJS\ExtDirect\RequestHandler', array('sendResponse'), array(), '', FALSE);
+		$requestHandler = $this->getAccessibleMock('TYPO3\ExtJS\ExtDirect\RequestHandler', array('sendResponse'), array(), '', FALSE);
 		$requestHandler->_set('requestBuilder', $mockRequestBuilder);
 		$requestHandler->_set('dispatcher', $mockDispatcher);
 		$requestHandler->_set('systemLogger', $mockSystemLogger);

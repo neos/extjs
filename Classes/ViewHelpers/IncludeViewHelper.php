@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ViewHelpers;
+namespace TYPO3\ExtJS\ViewHelpers;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -28,17 +28,17 @@ namespace F3\ExtJS\ViewHelpers;
  * @scope prototype
  * @api
  */
-class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
+class IncludeViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Resource\Publishing\ResourcePublisher
+	 * @var \TYPO3\FLOW3\Resource\Publishing\ResourcePublisher
 	 */
 	protected $resourcePublisher;
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
 	 */
 	protected $objectManager;
 
@@ -48,7 +48,7 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * = Examples =
 	 *
 	 * <code title="Simple">
-	 * {namespace ext=F3\ExtJS\ViewHelpers}
+	 * {namespace ext=TYPO3\ExtJS\ViewHelpers}
 	 *  ...
 	 * <ext:include/>
 	 * </code>
@@ -70,7 +70,7 @@ class IncludeViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 		if ($debug === NULL) {
 			$debug = ($this->objectManager->getContext() === 'Development') ?: FALSE;
 		}
-		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
+		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/TYPO3.ExtJS/';
 		$output = '';
 		if ($includeStylesheets) {
 			$output .= '

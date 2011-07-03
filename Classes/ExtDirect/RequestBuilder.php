@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -30,32 +30,32 @@ class RequestBuilder {
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
 	 */
 	protected $objectManager;
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Utility\Environment
+	 * @var \TYPO3\FLOW3\Utility\Environment
 	 */
 	protected $environment;
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Configuration\ConfigurationManager
+	 * @var \TYPO3\FLOW3\Configuration\ConfigurationManager
 	 */
 	protected $configurationManager;
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\MVC\Web\Routing\RouterInterface
+	 * @var \TYPO3\FLOW3\MVC\Web\Routing\RouterInterface
 	 */
 	protected $router;
 
 	/**
 	 * Builds an Ext Direct request
 	 *
-	 * @return \F3\ExtJS\ExtDirect\Request The built request
+	 * @return \TYPO3\ExtJS\ExtDirect\Request The built request
 	 */
 	public function build() {
 		$postArguments = $this->environment->getRawPostArguments();
@@ -67,7 +67,7 @@ class RequestBuilder {
 		}
 
 			// Explicitly configure the router like the original RequestBuilder
-		$routesConfiguration = $this->configurationManager->getConfiguration(\F3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
+		$routesConfiguration = $this->configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
 		$this->router->setRoutesConfiguration($routesConfiguration);
 
 		return $request;
@@ -77,22 +77,22 @@ class RequestBuilder {
 	 * Builds a Json Ext Direct request by reading the transaction data from
 	 * standard input.
 	 *
-	 * @return \F3\ExtJS\ExtDirect\Request The Ext Direct request object
-	 * @throws \F3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
+	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
+	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	protected function buildJsonRequest() {
 		$transactionDatas = json_decode(file_get_contents('php://input'));
 		if ($transactionDatas === NULL) {
-			throw new \F3\ExtJS\ExtDirect\Exception\InvalidExtRequestException('The request is not a valid Ext Direct request', 1268490738);
+			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException('The request is not a valid Ext Direct request', 1268490738);
 		}
 
 		if (!is_array($transactionDatas)) {
 			$transactionDatas = array($transactionDatas);
 		}
 
-		$request = $this->objectManager->create('F3\ExtJS\ExtDirect\Request');
+		$request = $this->objectManager->create('TYPO3\ExtJS\ExtDirect\Request');
 		foreach ($transactionDatas as $transactionData) {
 			$request->createAndAddTransaction(
 				$transactionData->action,
@@ -107,7 +107,7 @@ class RequestBuilder {
 	/**
 	 * Builds a Form Post Ext Direct Request
 	 *
-	 * @return \F3\ExtJS\ExtDirect\Request The Ext Direct request object
+	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 * @author Robert Lemke <robert@typo3.org>
 	 * @todo Well... make it work, eh?

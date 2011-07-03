@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ViewHelpers;
+namespace TYPO3\ExtJS\ViewHelpers;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -28,11 +28,11 @@ namespace F3\ExtJS\ViewHelpers;
  * @scope prototype
  * @api
  */
-class UxViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
+class UxViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Resource\Publishing\ResourcePublisher
+	 * @var \TYPO3\FLOW3\Resource\Publishing\ResourcePublisher
 	 */
 	protected $resourcePublisher;
 
@@ -42,7 +42,7 @@ class UxViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * = Examples =
 	 *
 	 * <code title="Simple">
-	 * {namespace ext=F3\ExtJS\ViewHelpers}
+	 * {namespace ext=TYPO3\ExtJS\ViewHelpers}
 	 *  ...
 	 * <ext:ux name="StatusBar"/>
 	 * </code>
@@ -54,7 +54,7 @@ class UxViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @api
 	 */
 	public function render($name) {
-		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/ExtJS/';
+		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/TYPO3.ExtJS/';
 		return '
 <script type="text/javascript" src="' . $baseUri . 'JavaScript/ux/' . $name . '.js"></script>
 ';

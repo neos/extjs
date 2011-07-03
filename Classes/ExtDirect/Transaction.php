@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -31,20 +31,20 @@ class Transaction {
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Reflection\ReflectionService
+	 * @var \TYPO3\FLOW3\Reflection\ReflectionService
 	 */
 	protected $reflectionService;
 
 	/**
 	 * @inject
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
+	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
 	 */
 	protected $objectManager;
 
 	/**
 	 * The direct request this transaction belongs to
 	 *
-	 * @var \F3\ExtJS\ExtDirect\Request
+	 * @var \TYPO3\ExtJS\ExtDirect\Request
 	 */
 	protected $request;
 
@@ -79,14 +79,14 @@ class Transaction {
 	/**
 	 * Constructs the Transaction
 	 *
-	 * @param \F3\ExtJS\ExtDirect\Request $request The direct request this transaction belongs to
+	 * @param \TYPO3\ExtJS\ExtDirect\Request $request The direct request this transaction belongs to
 	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
 	 * @param string $method The "method" – the "action name" in FLOW3 terms
 	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
 	 * @param mixed $tid The ExtDirect transaction id
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	public function __construct(\F3\ExtJS\ExtDirect\Request $request, $action, $method, array $data, $tid) {
+	public function __construct(\TYPO3\ExtJS\ExtDirect\Request $request, $action, $method, array $data, $tid) {
 		$this->request = $request;
 		$this->action = $action;
 		$this->method = $method;
@@ -97,11 +97,11 @@ class Transaction {
 	/**
 	 * Build a web request for dispatching this Ext Direct transaction
 	 *
-	 * @return \F3\FLOW3\MVC\Web\Request A web request for this transaction
+	 * @return \TYPO3\FLOW3\MVC\Web\Request A web request for this transaction
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function buildRequest() {
-		$request = $this->objectManager->create('F3\FLOW3\MVC\Web\Request');
+		$request = $this->objectManager->create('TYPO3\FLOW3\MVC\Web\Request');
 		$request->setControllerObjectName($this->getControllerObjectName());
 		$request->setControllerActionName($this->getMethod());
 		$request->setFormat('extdirect');
@@ -112,11 +112,11 @@ class Transaction {
 	/**
 	 * Build a response for dispatching this Ext Direct transaction
 	 *
-	 * @return \F3\ExtJS\ExtDirect\TransactionResponse A response for dispatching this transaction
+	 * @return \TYPO3\ExtJS\ExtDirect\TransactionResponse A response for dispatching this transaction
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function buildResponse() {
-		return $this->objectManager->create('F3\ExtJS\ExtDirect\TransactionResponse');
+		return $this->objectManager->create('TYPO3\ExtJS\ExtDirect\TransactionResponse');
 	}
 
 	/**
@@ -177,7 +177,7 @@ class Transaction {
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function getControllerObjectName() {
-		return 'F3\\' . str_replace('_', '\\', $this->action);
+		return str_replace('_', '\\', $this->action);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class Transaction {
 		if (!$this->request->isFormPost()) {
 			$parameters = $this->reflectionService->getMethodParameters($this->getControllerObjectName(), $this->method . 'Action');
 
-			// TODO Add checks for parameters
+				// TODO Add checks for parameters
 			foreach ($parameters as $name => $options) {
 				$parameterIndex = $options['position'];
 				if (isset($this->data[$parameterIndex])) {
@@ -207,7 +207,7 @@ class Transaction {
 			}
 
 		} else {
-			// TODO Reuse setArgumentsFromRawRequestData from Web/RequestBuilder
+				// TODO Reuse setArgumentsFromRawRequestData from Web/RequestBuilder
 		}
 
 		return $arguments;

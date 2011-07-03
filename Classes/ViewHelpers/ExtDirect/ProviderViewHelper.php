@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ViewHelpers\ExtDirect;
+namespace TYPO3\ExtJS\ViewHelpers\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -28,10 +28,10 @@ namespace F3\ExtJS\ViewHelpers\ExtDirect;
  * @scope prototype
  * @api
  */
-class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
+class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
-	 * @var \F3\FLOW3\Reflection\ReflectionService
+	 * @var \TYPO3\FLOW3\Reflection\ReflectionService
 	 */
 	protected $localReflectionService;
 
@@ -41,22 +41,22 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * A _private_ property "reflectionService" already exists in the AbstractViewHelper,
 	 * therefore we need to switch to another property name.
 	 *
-	 * @param \F3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
+	 * @param \TYPO3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
 	 * @return void
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function injectLocalReflectionService(\F3\FLOW3\Reflection\ReflectionService $reflectionService) {
+	public function injectLocalReflectionService(\TYPO3\FLOW3\Reflection\ReflectionService $reflectionService) {
 		$this->localReflectionService = $reflectionService;
 	}
 
 	/**
 	 * Injects the security context
 	 *
-	 * @param \F3\FLOW3\Security\Context $securityContext The security context
+	 * @param \TYPO3\FLOW3\Security\Context $securityContext The security context
 	 * @return void
 	 * @author Andreas Förthner <andreas.foerthner@netlogix.de>
 	 */
-	public function injectSecurityContext(\F3\FLOW3\Security\Context $securityContext) {
+	public function injectSecurityContext(\TYPO3\FLOW3\Security\Context $securityContext) {
 		$this->securityContext = $securityContext;
 	}
 
@@ -67,7 +67,7 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * = Examples =
 	 *
 	 * <code title="Simple">
-	 * {namespace ext=F3\ExtJS\ViewHelpers}
+	 * {namespace ext=TYPO3\ExtJS\ViewHelpers}
 	 *  ...
 	 * <script type="text/javascript">
 	 * <ext:extdirect.provider />
@@ -80,14 +80,16 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @return string JavaScript needed to include Ext Direct provider
 	 * @api
 	 */
-	public function render($namespace = 'F3') {
+	public function render($namespace = NULL) {
 		$providerConfig = array(
-			'url' => '?F3_ExtJS_ExtDirectRequest=1&__CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
+			'url' => '?TYPO3_ExtJS_ExtDirectRequest=1&__CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
 			'type' => 'remoting',
-			'namespace' => $namespace,
 			'actions' => array()
 		);
-		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('F3\FLOW3\MVC\Controller\ControllerInterface');
+		if (!empty($namespace)) {
+			$providerConfig['namespace'] = $namespace;
+		}
+		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('TYPO3\FLOW3\MVC\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
 			$methodNames = get_class_methods($controllerClassName);
 			foreach ($methodNames as $methodName) {
@@ -101,7 +103,8 @@ class ProviderViewHelper extends \F3\Fluid\Core\ViewHelper\AbstractViewHelper {
 						}
 						$requiredMethodParametersCount ++;
 					}
-					$extDirectAction = str_replace('\\', '_', str_replace('F3\\', '', $controllerClassName));
+					$extDirectAction = str_replace('\\', '_', $controllerClassName);
+
 					$providerConfig['actions'][$extDirectAction][] = array(
 						'name' => substr($methodName, 0, -6),
 						'len' => $requiredMethodParametersCount

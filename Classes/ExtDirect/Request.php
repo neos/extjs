@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -28,12 +28,6 @@ namespace F3\ExtJS\ExtDirect;
  * @scope prototype
  */
 class Request {
-
-	/**
-	 * @inject
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
-	 */
-	protected $objectManager;
 
 	/**
 	 * The transactions inside this request
@@ -66,7 +60,7 @@ class Request {
 	 * @return void
 	 */
 	public function createAndAddTransaction($action, $method, array $data, $tid) {
-		$transaction = $this->objectManager->create('F3\ExtJS\ExtDirect\Transaction', $this, $action, $method, $data, $tid);
+		$transaction = new \TYPO3\ExtJS\ExtDirect\Transaction($this, $action, $method, $data, $tid);
 		$this->transactions[] = $transaction;
 	}
 

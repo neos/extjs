@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect\Exception;
+namespace TYPO3\ExtJS\ExtDirect\Exception;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -26,7 +26,7 @@ namespace F3\ExtJS\ExtDirect\Exception;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class InvalidExtDirectRequestException extends \F3\FLOW3\Exception {
+class InvalidExtDirectRequestException extends \TYPO3\FLOW3\Exception {
 
 }
 ?>

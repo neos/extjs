@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -27,7 +27,7 @@ namespace F3\ExtJS\ExtDirect;
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */
-class TransactionResponse extends \F3\FLOW3\MVC\Web\Response {
+class TransactionResponse extends \TYPO3\FLOW3\MVC\Web\Response {
 
 	/**
 	 * The Ext Direct result that will be JSON encoded

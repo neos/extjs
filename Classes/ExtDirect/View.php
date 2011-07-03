@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -28,7 +28,7 @@ namespace F3\ExtJS\ExtDirect;
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */
-class View extends \F3\FLOW3\MVC\View\JsonView {
+class View extends \TYPO3\FLOW3\MVC\View\JsonView {
 	/**
 	 * Renders the Ext Direct view by delegating to the JsonView
 	 * for rendering a serializable array.
@@ -46,10 +46,10 @@ class View extends \F3\FLOW3\MVC\View\JsonView {
 	 * Assigns errors to the view and converts them to a format that Ext JS
 	 * understands.
 	 *
-	 * @param \F3\FLOW3\Error\Result $result Errors e.g. from mapping results
+	 * @param \TYPO3\FLOW3\Error\Result $result Errors e.g. from mapping results
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function assignErrors(\F3\FLOW3\Error\Result $result) {
+	public function assignErrors(\TYPO3\FLOW3\Error\Result $result) {
 		$errors = $result->getFlattenedErrors();
 		$output = array();
 		foreach ($errors as $propertyPath => $propertyErrors) {

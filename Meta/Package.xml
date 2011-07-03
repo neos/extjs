@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <package xmlns="http://typo3.org/ns/2008/flow3/package">
-    <key>ExtJS</key>
+    <key>TYPO3.ExtJS</key>
     <title>ExtJS Package</title>
     <description>The package contains ExtJS for use in FLOW3 packages. It is a
 	slightly trimmed version of ExtJS (missing source, build, examples,

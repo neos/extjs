@@ -1,5 +1,5 @@
 <?php
-namespace F3\ExtJS\ExtDirect;
+namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "ExtJS".                      *
@@ -26,30 +26,25 @@ namespace F3\ExtJS\ExtDirect;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
+class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 
 	/**
-	 * @var \F3\FLOW3\Object\ObjectManagerInterface
-	 */
-	protected $objectManager;
-
-	/**
-	 * @var \F3\FLOW3\Utility\Environment
+	 * @var \TYPO3\FLOW3\Utility\Environment
 	 */
 	protected $environment;
 
 	/**
-	 * @var \F3\FLOW3\MVC\Dispatcher
+	 * @var \TYPO3\FLOW3\MVC\Dispatcher
 	 */
 	protected $dispatcher;
 
 	/**
-	 * @var \F3\ExtJS\ExtDirect\RequestBuilder
+	 * @var \TYPO3\ExtJS\ExtDirect\RequestBuilder
 	 */
 	protected $requestBuilder;
 
 	/**
-	 * @var \F3\FLOW3\Log\SystemLoggerInterface
+	 * @var \TYPO3\FLOW3\Log\SystemLoggerInterface
 	 */
 	protected $systemLogger;
 
@@ -62,20 +57,17 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	/**
 	 * Constructs the Ext Direct Request Handler
 	 *
-	 * @param \F3\FLOW3\Object\ObjectManagerInterface $objectManager A reference to the object factory
-	 * @param \F3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
-	 * @param \F3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
-	 * @param \F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder
-	 * @param \F3\FLOW3\Log\SystemLoggerInterface $systemLogger
+	 * @param \TYPO3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
+	 * @param \TYPO3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
+	 * @param \TYPO3\ExtJS\ExtDirect\RequestBuilder $requestBuilder
+	 * @param \TYPO3\FLOW3\Log\SystemLoggerInterface $systemLogger
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function __construct(
-			\F3\FLOW3\Object\ObjectManagerInterface $objectManager,
-			\F3\FLOW3\Utility\Environment $utilityEnvironment,
-			\F3\FLOW3\MVC\Dispatcher $dispatcher,
-			\F3\ExtJS\ExtDirect\RequestBuilder $requestBuilder,
-			\F3\FLOW3\Log\SystemLoggerInterface $systemLogger) {
-		$this->objectManager = $objectManager;
+			\TYPO3\FLOW3\Utility\Environment $utilityEnvironment,
+			\TYPO3\FLOW3\MVC\Dispatcher $dispatcher,
+			\TYPO3\ExtJS\ExtDirect\RequestBuilder $requestBuilder,
+			\TYPO3\FLOW3\Log\SystemLoggerInterface $systemLogger) {
 		$this->environment = $utilityEnvironment;
 		$this->dispatcher = $dispatcher;
 		$this->requestBuilder = $requestBuilder;
@@ -143,7 +135,7 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	 */
 	public function canHandleRequest() {
 		$getArguments = $this->environment->getRawGetArguments();
-		return isset($getArguments['F3_ExtJS_ExtDirectRequest']);
+		return isset($getArguments['TYPO3_ExtJS_ExtDirectRequest']);
 	}
 
 	/**
@@ -161,11 +153,11 @@ class RequestHandler implements \F3\FLOW3\MVC\RequestHandlerInterface {
 	 * Sends the response
 	 *
 	 * @param array $results The collected results from the transaction requests
-	 * @param \F3\ExtJS\ExtDirect\Request $extDirectRequest
+	 * @param \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest
 	 * @return void
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
-	protected function sendResponse(array $results, \F3\ExtJS\ExtDirect\Request $extDirectRequest) {
+	protected function sendResponse(array $results, \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest) {
 		$response = json_encode(count($results) === 1 ? $results[0] : $results);
 		if ($extDirectRequest->isFormPost() && $extDirectRequest->isFileUpload()) {
 			header('Content-Type: text/html');
