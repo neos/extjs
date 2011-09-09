@@ -82,7 +82,7 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 	 */
 	public function render($namespace = NULL) {
 		$providerConfig = array(
-			'url' => '?TYPO3_ExtJS_ExtDirectRequest=1&__CSRF-TOKEN=' . $this->securityContext->getCsrfProtectionToken(),
+			'url' => '?TYPO3_ExtJS_ExtDirectRequest=1&__csrfToken=' . $this->securityContext->getCsrfProtectionToken(),
 			'type' => 'remoting',
 			'actions' => array()
 		);
