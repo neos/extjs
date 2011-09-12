@@ -24,7 +24,6 @@ namespace TYPO3\ExtJS\ExtDirect\Exception;
 /**
  * An exception for an invalid Ext Direct request
  *
- * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class InvalidExtDirectRequestException extends \TYPO3\FLOW3\Exception {
 

@@ -24,7 +24,6 @@ namespace TYPO3\ExtJS\ExtDirect;
 /**
  * The Ext Direct request handler
  *
- * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 

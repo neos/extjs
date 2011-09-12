@@ -24,7 +24,6 @@ namespace TYPO3\ExtJS\Tests\Unit\ExtDirect;
 /**
  * Testcase for the ExtDirect View
  *
- * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class ViewTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 

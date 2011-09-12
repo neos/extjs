@@ -25,7 +25,6 @@ namespace TYPO3\ExtJS\ExtDirect;
  * A transparent view that extends JsonView and passes on the prepared array
  * to the Ext Direct response.
  *
- * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  * @scope prototype
  */
 class View extends \TYPO3\FLOW3\MVC\View\JsonView {
