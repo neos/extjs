@@ -84,7 +84,7 @@ class RequestBuilder {
 	protected function buildJsonRequest() {
 		$transactionDatas = json_decode(file_get_contents('php://input'));
 		if ($transactionDatas === NULL) {
-			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException('The request is not a valid Ext Direct request', 1268490738);
+			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException('The request is not a valid Ext Direct request', 1268490738);
 		}
 
 		if (!is_array($transactionDatas)) {
