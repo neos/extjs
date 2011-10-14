@@ -33,6 +33,11 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	protected $requestBuilder;
 
 	/**
+	 * @var \TYPO3\ExtJS\ExtDirect\Request
+	 */
+	protected $request;
+
+	/**
 	 * @var \TYPO3\FLOW3\Log\SystemLoggerInterface
 	 */
 	protected $systemLogger;
@@ -84,10 +89,10 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequest() {
-		$extDirectRequest = $this->requestBuilder->build();
+		$this->request = $this->requestBuilder->build();
 
 		$results = array();
-		foreach ($extDirectRequest->getTransactions() as $transaction) {
+		foreach ($this->request->getTransactions() as $transaction) {
 			$transactionRequest = $transaction->buildRequest();
 			$transactionResponse = $transaction->buildResponse();
 
@@ -113,7 +118,7 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 			}
 		}
 
-		$this->sendResponse($results, $extDirectRequest);
+		$this->sendResponse($results, $this->request);
 	}
 
 	/**
@@ -136,6 +141,22 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	 */
 	public function getPriority() {
 		return 200;
+	}
+
+	/**
+	 * Returns the top level request built by the request handler.
+	 *
+	 * In most cases the dispatcher or other parts of the request-response chain
+	 * should be preferred for retrieving the current request, because sub requests
+	 * or simulated requests are built later in the process.
+	 *
+	 * If, however, the original top level request is wanted, this is the right
+	 * method for getting it.
+	 *
+	 * @return \TYPO3\FLOW3\MVC\RequestInterface The originally built web request
+	 */
+	public function getRequest() {
+		return $this->request;
 	}
 
 	/**
