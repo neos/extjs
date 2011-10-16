@@ -11,10 +11,12 @@ namespace TYPO3\ExtJS\ViewHelpers\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\FLOW3\Annotations as FLOW3;
+
 /**
  * Ext Direct Provider view helper
  *
- * @scope prototype
+ * @FLOW3\Scope("prototype")
  * @api
  */
 class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
@@ -51,7 +53,7 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 
 	/**
 	 * Returns the JavaScript to declare the Ext Direct provider for all
-	 * controller actions that are annotated with @extdirect
+	 * controller actions that are annotated with "@TYPO3\ExtJS\Annotations\ExtDirect"
 	 *
 	 * = Examples =
 	 *
