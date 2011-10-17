@@ -11,10 +11,12 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\FLOW3\Annotations as FLOW3;
+
 /**
  * An Ext Direct request
  *
- * @scope prototype
+ * @FLOW3\Scope("prototype")
  */
 class Request {
 

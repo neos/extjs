@@ -11,10 +11,12 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\FLOW3\Annotations as FLOW3;
+
 /**
  * A Ext Direct specific response implementation with raw content for json encodable results
  *
- * @scope prototype
+ * @FLOW3\Scope("prototype")
  */
 class TransactionResponse extends \TYPO3\FLOW3\MVC\Web\Response {
 
