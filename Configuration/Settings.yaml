@@ -8,7 +8,8 @@
 # possible configuration options.                                        #
 #                                                                        #
 
-ExtJS:
-  ExtDirect:
-    # Output exception information to the client in Ext Direct requests
-    exposeExceptionInformation: yes
+TYPO3:
+  ExtJS:
+    ExtDirect:
+      # Output exception information to the client in Ext Direct requests
+      exposeExceptionInformation: yes
