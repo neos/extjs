@@ -107,8 +107,8 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 				);
 			} catch (\Exception $exception) {
 				$this->systemLogger->logException($exception);
-				$exceptionMessage = $this->exposeExceptionInformation ? $exception->getMessage() : 'An internal error occured';
-				$exceptionWhere = $this->exposeExceptionInformation ? $exception->getTraceAsString() : '';
+				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
+				$exceptionMessage = $this->exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
 				$results[] = array(
 					'type' => 'exception',
 					'tid' => $transaction->getTid(),
