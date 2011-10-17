@@ -21,12 +21,6 @@ class RequestBuilder {
 
 	/**
 	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
-	 */
-	protected $objectManager;
-
-	/**
-	 * @FLOW3\Inject
 	 * @var \TYPO3\FLOW3\Utility\Environment
 	 */
 	protected $environment;
@@ -83,7 +77,7 @@ class RequestBuilder {
 			$transactionDatas = array($transactionDatas);
 		}
 
-		$request = $this->objectManager->create('TYPO3\ExtJS\ExtDirect\Request');
+		$request = new Request();
 		foreach ($transactionDatas as $transactionData) {
 			$request->createAndAddTransaction(
 				$transactionData->action,

@@ -27,12 +27,6 @@ class Transaction {
 	protected $reflectionService;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
-	 */
-	protected $objectManager;
-
-	/**
 	 * The direct request this transaction belongs to
 	 *
 	 * @var \TYPO3\ExtJS\ExtDirect\Request
@@ -92,7 +86,7 @@ class Transaction {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function buildRequest() {
-		$request = $this->objectManager->create('TYPO3\FLOW3\MVC\Web\Request');
+		$request = new \TYPO3\FLOW3\MVC\Web\Request();
 		$request->setControllerObjectName($this->getControllerObjectName());
 		$request->setControllerActionName($this->getMethod());
 		$request->setFormat('extdirect');
@@ -107,7 +101,7 @@ class Transaction {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function buildResponse() {
-		return $this->objectManager->create('TYPO3\ExtJS\ExtDirect\TransactionResponse');
+		return new \TYPO3\ExtJS\ExtDirect\TransactionResponse();
 	}
 
 	/**
