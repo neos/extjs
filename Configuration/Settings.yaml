@@ -12,4 +12,4 @@ TYPO3:
   ExtJS:
     ExtDirect:
       # Output exception information to the client in Ext Direct requests
-      exposeExceptionInformation: yes
+      exposeExceptionInformation: TRUE
