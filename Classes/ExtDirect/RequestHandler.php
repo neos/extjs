@@ -18,32 +18,17 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  *
  * @FLOW3\Scope("singleton")
  */
-class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
+class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 
 	/**
-	 * @var \TYPO3\FLOW3\Utility\Environment
+	 * @var \TYPO3\FLOW3\Core\Bootstrap
 	 */
-	protected $environment;
-
-	/**
-	 * @var \TYPO3\FLOW3\MVC\Dispatcher
-	 */
-	protected $dispatcher;
-
-	/**
-	 * @var \TYPO3\ExtJS\ExtDirect\RequestBuilder
-	 */
-	protected $requestBuilder;
+	protected $bootstrap;
 
 	/**
 	 * @var \TYPO3\ExtJS\ExtDirect\Request
 	 */
 	protected $request;
-
-	/**
-	 * @var \TYPO3\FLOW3\Log\SystemLoggerInterface
-	 */
-	protected $systemLogger;
 
 	/**
 	 * Whether to expose exception information in an ExtDirect response
@@ -52,36 +37,13 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	protected $exposeExceptionInformation = FALSE;
 
 	/**
-	 * Constructs the Ext Direct Request Handler
+	 * Constructor
 	 *
-	 * @param \TYPO3\FLOW3\Utility\Environment $utilityEnvironment A reference to the environment
-	 * @param \TYPO3\FLOW3\MVC\Dispatcher $dispatcher The request dispatcher
-	 * @param \TYPO3\ExtJS\ExtDirect\RequestBuilder $requestBuilder
-	 * @param \TYPO3\FLOW3\Log\SystemLoggerInterface $systemLogger
-	 * @author Robert Lemke <robert@typo3.org>
-	 */
-	public function __construct(
-			\TYPO3\FLOW3\Utility\Environment $utilityEnvironment,
-			\TYPO3\FLOW3\MVC\Dispatcher $dispatcher,
-			\TYPO3\ExtJS\ExtDirect\RequestBuilder $requestBuilder,
-			\TYPO3\FLOW3\Log\SystemLoggerInterface $systemLogger) {
-		$this->environment = $utilityEnvironment;
-		$this->dispatcher = $dispatcher;
-		$this->requestBuilder = $requestBuilder;
-		$this->systemLogger = $systemLogger;
-	}
-
-	/**
-	 * Inject the settings
-	 *
-	 * @param array $settings The settings
+	 * @param \TYPO3\FLOW3\Core\Bootstrap $bootstrap
 	 * @return void
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
-	public function injectSettings(array $settings) {
-		if (!isset($settings['ExtDirect'])) return;
-
-		$this->exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
+	public function __construct(\TYPO3\FLOW3\Core\Bootstrap $bootstrap) {
+		$this->bootstrap = $bootstrap;
 	}
 
 	/**
@@ -92,7 +54,13 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequest() {
-		$this->request = $this->requestBuilder->build();
+		$sequence = $this->bootstrap->buildRuntimeSequence();
+		$sequence->invoke($this->bootstrap);
+
+		$objectManager = $this->bootstrap->getObjectManager();
+
+		$this->request = $objectManager->get('TYPO3\ExtJS\ExtDirect\RequestBuilder')->build();
+		$dispatcher = $objectManager->get('TYPO3\FLOW3\MVC\Dispatcher');
 
 		$results = array();
 		foreach ($this->request->getTransactions() as $transaction) {
@@ -100,7 +68,7 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 			$transactionResponse = $transaction->buildResponse();
 
 			try {
-				$this->dispatcher->dispatch($transactionRequest, $transactionResponse);
+				$dispatcher->dispatch($transactionRequest, $transactionResponse);
 				$results[] = array(
 					'type' => 'rpc',
 					'tid' => $transaction->getTid(),
@@ -109,9 +77,16 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 					'result' => $transactionResponse->getResult()
 				);
 			} catch (\Exception $exception) {
-				$this->systemLogger->logException($exception);
+				$systemLogger = $objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
+				$systemLogger->logException($exception);
+
+					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
+				$configurationManager = $objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
+				$settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
+				$exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
+
 				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
-				$exceptionMessage = $this->exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
+				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
 				$results[] = array(
 					'type' => 'exception',
 					'tid' => $transaction->getTid(),
@@ -122,6 +97,7 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 		}
 
 		$this->sendResponse($results, $this->request);
+		$this->bootstrap->shutdown('Runtime');
 	}
 
 	/**
@@ -131,8 +107,7 @@ class RequestHandler implements \TYPO3\FLOW3\MVC\RequestHandlerInterface {
 	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function canHandleRequest() {
-		$getArguments = $this->environment->getRawGetArguments();
-		return isset($getArguments['TYPO3_ExtJS_ExtDirectRequest']);
+		return isset($_GET['TYPO3_ExtJS_ExtDirectRequest']);
 	}
 
 	/**
