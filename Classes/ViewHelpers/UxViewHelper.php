@@ -16,7 +16,6 @@ use TYPO3\FLOW3\Annotations as FLOW3;
 /**
  * ExtJS ux class inclusion view helper
  *
- * @FLOW3\Scope("prototype")
  * @api
  */
 class UxViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {

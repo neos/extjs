@@ -16,7 +16,6 @@ use TYPO3\FLOW3\Annotations as FLOW3;
 /**
  * An Ext Direct request
  *
- * @FLOW3\Scope("prototype")
  */
 class Request extends \TYPO3\FLOW3\MVC\Web\Request {
 

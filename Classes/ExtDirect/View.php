@@ -17,7 +17,6 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  * A transparent view that extends JsonView and passes on the prepared array
  * to the Ext Direct response.
  *
- * @FLOW3\Scope("prototype")
  */
 class View extends \TYPO3\FLOW3\MVC\View\JsonView {
 	/**
