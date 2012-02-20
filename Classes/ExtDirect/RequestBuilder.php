@@ -64,8 +64,6 @@ class RequestBuilder {
 	 *
 	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
 	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
-	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	protected function buildJsonRequest() {
 		$transactionDatas = json_decode(file_get_contents('php://input'));
@@ -93,8 +91,6 @@ class RequestBuilder {
 	 * Builds a Form Post Ext Direct Request
 	 *
 	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
-	 * @author Robert Lemke <robert@typo3.org>
 	 * @todo Well... make it work, eh?
 	 */
 	protected function buildFormPostRequest() {

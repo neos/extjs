@@ -33,7 +33,6 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 	 *
 	 * @param \TYPO3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
 	 * @return void
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function injectLocalReflectionService(\TYPO3\FLOW3\Reflection\ReflectionService $reflectionService) {
 		$this->localReflectionService = $reflectionService;
@@ -44,7 +43,6 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 	 *
 	 * @param \TYPO3\FLOW3\Security\Context $securityContext The security context
 	 * @return void
-	 * @author Andreas Förthner <andreas.foerthner@netlogix.de>
 	 */
 	public function injectSecurityContext(\TYPO3\FLOW3\Security\Context $securityContext) {
 		$this->securityContext = $securityContext;

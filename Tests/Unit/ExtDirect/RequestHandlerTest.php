@@ -32,7 +32,6 @@ class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @test
-	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function canHandleRequestReturnsTrueIfTheSapiTypeIsWebAndAnExtDirectGetParameterIsSent() {
 		$requestHandler = $this->getAccessibleMock('TYPO3\ExtJS\ExtDirect\RequestHandler', array('sendResponse'), array(), '', FALSE);
@@ -43,7 +42,6 @@ class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @test
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequestCatchesAndLogsExceptionsAndReturnsThemInTheTransaction() {
 		$mockBootstrap = $this->getMock('TYPO3\FLOW3\Core\Bootstrap', array(), array(), '', FALSE);

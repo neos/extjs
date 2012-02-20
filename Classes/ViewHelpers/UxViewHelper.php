@@ -40,7 +40,6 @@ class UxViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 *
 	 * @param string $name The name of the ux class
 	 * @return string HTML needed to include ExtJS
-	 * @author Karsten Dambekalns <karsten@typo3.org>
 	 * @api
 	 */
 	public function render($name) {

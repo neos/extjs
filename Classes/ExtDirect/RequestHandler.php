@@ -55,8 +55,6 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	 * Handles a raw Ext Direct request and sends the respsonse.
 	 *
 	 * @return void
-	 * @author Robert Lemke <robert@typo3.org>
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function handleRequest() {
 		$sequence = $this->bootstrap->buildRuntimeSequence();
@@ -114,7 +112,6 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	 * Checks if the request handler can handle the current request.
 	 *
 	 * @return boolean TRUE if it can handle the request, otherwise FALSE
-	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function canHandleRequest() {
 		return isset($_GET['TYPO3_ExtJS_ExtDirectRequest']);
@@ -125,7 +122,6 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	 * request.
 	 *
 	 * @return integer The priority of the request handler
-	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	public function getPriority() {
 		return 200;
@@ -150,7 +146,6 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	 * @param array $results The collected results from the transaction requests
 	 * @param \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest
 	 * @return void
-	 * @author Robert Lemke <robert@typo3.org>
 	 */
 	protected function sendResponse(array $results, \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest) {
 		$response = json_encode(count($results) === 1 ? $results[0] : $results);

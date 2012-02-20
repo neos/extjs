@@ -53,7 +53,6 @@ class IncludeViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper 
 	 * @param boolean $debug Whether to use the debug version of ExtJS
 	 * @param boolean $includeStylesheets Include ExtJS CSS files if true
 	 * @return string HTML needed to include ExtJS
-	 * @author Karsten Dambekalns <karsten@typo3.org>
 	 * @api
 	 */
 	public function render($theme = 'xtheme-blue', $debug = NULL, $includeStylesheets = TRUE) {

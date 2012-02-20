@@ -24,7 +24,6 @@ class View extends \TYPO3\FLOW3\MVC\View\JsonView {
 	 * for rendering a serializable array.
 	 *
 	 * @return string An empty string
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function render() {
 		$result = $this->renderArray();
@@ -37,7 +36,6 @@ class View extends \TYPO3\FLOW3\MVC\View\JsonView {
 	 * understands.
 	 *
 	 * @param \TYPO3\FLOW3\Error\Result $result Errors e.g. from mapping results
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function assignErrors(\TYPO3\FLOW3\Error\Result $result) {
 		$errors = $result->getFlattenedErrors();

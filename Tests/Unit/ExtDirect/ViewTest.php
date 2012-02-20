@@ -19,7 +19,6 @@ class ViewTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @test
-	 * @author Christopher Hlubek <hlubek@networkteam.com>
 	 */
 	public function assignErrorsConvertsErrorsToExtJSFormat() {
 		$propertyError = new \TYPO3\FLOW3\Error\Error('Some error', 12345678);
