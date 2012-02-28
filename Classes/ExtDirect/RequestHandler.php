@@ -37,6 +37,11 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	protected $exposeExceptionInformation = FALSE;
 
 	/**
+	 * @var \TYPO3\FLOW3\MVC\Web\Request
+	 */
+	protected $requestOfCurrentTransaction;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \TYPO3\FLOW3\Core\Bootstrap $bootstrap
@@ -59,22 +64,27 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 
 		$objectManager = $this->bootstrap->getObjectManager();
 
+		$securityContext = $objectManager->get('TYPO3\FLOW3\Security\Context');
+
 		$this->request = $objectManager->get('TYPO3\ExtJS\ExtDirect\RequestBuilder')->build();
 		$dispatcher = $objectManager->get('TYPO3\FLOW3\MVC\Dispatcher');
 
 		$results = array();
 		foreach ($this->request->getTransactions() as $transaction) {
-			$transactionRequest = $transaction->buildRequest();
-			$transactionResponse = $transaction->buildResponse();
+			$requestOfCurrentTransaction = $transaction->buildRequest();
+			$this->requestOfCurrentTransaction = $requestOfCurrentTransaction;
+			$responseOfCurrentTransaction = $transaction->buildResponse();
+
+			$securityContext->initialize();
 
 			try {
-				$dispatcher->dispatch($transactionRequest, $transactionResponse);
+				$dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
 				$results[] = array(
 					'type' => 'rpc',
 					'tid' => $transaction->getTid(),
 					'action' => $transaction->getAction(),
 					'method' => $transaction->getMethod(),
-					'result' => $transactionResponse->getResult()
+					'result' => $responseOfCurrentTransaction->getResult()
 				);
 			} catch (\Exception $exception) {
 				$systemLogger = $objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
@@ -122,19 +132,16 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	}
 
 	/**
-	 * Returns the top level request built by the request handler.
+	 * Returns the request of the currently running transaction.
 	 *
-	 * In most cases the dispatcher or other parts of the request-response chain
-	 * should be preferred for retrieving the current request, because sub requests
-	 * or simulated requests are built later in the process.
-	 *
-	 * If, however, the original top level request is wanted, this is the right
-	 * method for getting it.
+	 * WARNING: We do NOT return the top-level ExtDirect request here, as we want
+	 * Security to use the MVC Web Request, as the ExtDirectRequest just batches
+	 * numerous MVC requests for improving performance.
 	 *
 	 * @return \TYPO3\FLOW3\MVC\RequestInterface The originally built web request
 	 */
 	public function getRequest() {
-		return $this->request;
+		return $this->requestOfCurrentTransaction;
 	}
 
 	/**
