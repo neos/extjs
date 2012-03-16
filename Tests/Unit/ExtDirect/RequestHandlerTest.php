@@ -70,6 +70,8 @@ class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 		$mockObjectManager = $this->getMock('TYPO3\FLOW3\Object\ObjectManagerInterface');
 		$mockBootstrap->expects($this->once())->method('getObjectManager')->will($this->returnValue($mockObjectManager));
 
+		$mockSecurityContext = $this->getMock('TYPO3\FLOW3\Security\Context');
+
 		$mockConfigurationManager = $this->getMock('TYPO3\FLOW3\Configuration\ConfigurationManager', array(), array(), '', FALSE);
 		$mockConfigurationManager
 			->expects($this->once())
@@ -81,7 +83,8 @@ class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			'TYPO3\ExtJS\ExtDirect\RequestBuilder' => $mockRequestBuilder,
 			'TYPO3\FLOW3\MVC\Dispatcher' => $mockDispatcher,
 			'TYPO3\FLOW3\Log\SystemLoggerInterface' => $mockSystemLogger,
-			'TYPO3\FLOW3\Configuration\ConfigurationManager' => $mockConfigurationManager
+			'TYPO3\FLOW3\Configuration\ConfigurationManager' => $mockConfigurationManager,
+			'TYPO3\FLOW3\Security\Context' => $mockSecurityContext,
 		);
 
 		$mockObjectManager->expects($this->any())->method('get')->will($this->returnCallback(function($objectName) use ($objectsReturnedByObjectManager) {
