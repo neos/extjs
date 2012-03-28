@@ -18,7 +18,7 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  * to the Ext Direct response.
  *
  */
-class View extends \TYPO3\FLOW3\MVC\View\JsonView {
+class View extends \TYPO3\FLOW3\Mvc\View\JsonView {
 	/**
 	 * Renders the Ext Direct view by delegating to the JsonView
 	 * for rendering a serializable array.

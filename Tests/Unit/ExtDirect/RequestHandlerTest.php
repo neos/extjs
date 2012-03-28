@@ -51,7 +51,7 @@ class RequestHandlerTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 		$mockBootstrap->expects($this->once())->method('shutdown');
 
 		$mockRequest = $this->getMock('TYPO3\ExtJS\ExtDirect\Request', array('getTransactions'));
-		$mockTransactionRequest = $this->getMock('TYPO3\FLOW3\MVC\Web\Request');
+		$mockTransactionRequest = $this->getMock('TYPO3\FLOW3\Mvc\ActionRequest');
 		$mockTransactionResponse = $this->getMock('TYPO3\FLOW3\MVC\Web\Response');
 		$mockTransaction = $this->getMock('TYPO3\ExtJS\ExtDirect\Transaction', array('buildRequest', 'buildResponse'), array($mockRequest, 'someAction', 'someMethod', array(), 42));
 		$mockTransaction->expects($this->any())->method('buildRequest')->will($this->returnValue($mockTransactionRequest));

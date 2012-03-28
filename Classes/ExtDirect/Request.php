@@ -17,7 +17,7 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  * An Ext Direct request
  *
  */
-class Request extends \TYPO3\FLOW3\MVC\Web\Request {
+class Request extends \TYPO3\FLOW3\Mvc\ActionRequest {
 
 	/**
 	 * The transactions inside this request

@@ -33,7 +33,7 @@ class RequestBuilder {
 
 	/**
 	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\MVC\Web\Routing\RouterInterface
+	 * @var \TYPO3\FLOW3\Mvc\Routing\RouterInterface
 	 */
 	protected $router;
 

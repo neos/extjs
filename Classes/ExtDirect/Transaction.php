@@ -80,10 +80,10 @@ class Transaction {
 	/**
 	 * Build a web request for dispatching this Ext Direct transaction
 	 *
-	 * @return \TYPO3\FLOW3\MVC\Web\Request A web request for this transaction
+	 * @return \TYPO3\FLOW3\Mvc\ActionRequest A web request for this transaction
 	 */
 	public function buildRequest() {
-		$request = new \TYPO3\FLOW3\MVC\Web\Request();
+		$request = new \TYPO3\FLOW3\Mvc\ActionRequest();
 		$request->setControllerObjectName($this->getControllerObjectName());
 		$request->setControllerActionName($this->getMethod());
 		$request->setFormat('extdirect');

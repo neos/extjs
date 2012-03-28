@@ -17,7 +17,7 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  * A Ext Direct specific response implementation with raw content for json encodable results
  *
  */
-class TransactionResponse extends \TYPO3\FLOW3\MVC\Web\Response {
+class TransactionResponse extends \TYPO3\FLOW3\Http\Response {
 
 	/**
 	 * The Ext Direct result that will be JSON encoded

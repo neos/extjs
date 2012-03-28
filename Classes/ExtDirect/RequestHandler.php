@@ -37,7 +37,7 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	protected $exposeExceptionInformation = FALSE;
 
 	/**
-	 * @var \TYPO3\FLOW3\MVC\Web\Request
+	 * @var \TYPO3\FLOW3\Mvc\ActionRequest
 	 */
 	protected $requestOfCurrentTransaction;
 
@@ -134,7 +134,7 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	 * Security to use the MVC Web Request, as the ExtDirectRequest just batches
 	 * numerous MVC requests for improving performance.
 	 *
-	 * @return \TYPO3\FLOW3\MVC\RequestInterface The originally built web request
+	 * @return \TYPO3\FLOW3\Mvc\RequestInterface The originally built web request
 	 */
 	public function getRequest() {
 		return $this->requestOfCurrentTransaction;
