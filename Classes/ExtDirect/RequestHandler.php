@@ -12,13 +12,14 @@ namespace TYPO3\ExtJS\ExtDirect;
  *                                                                        */
 
 use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\FLOW3\Configuration\ConfigurationManager;
 
 /**
- * The Ext Direct request handler
+ * The ExtDirect request handler
  *
  * @FLOW3\Scope("singleton")
  */
-class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
+class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 
 	/**
 	 * @var \TYPO3\FLOW3\Core\Bootstrap
@@ -26,87 +27,30 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	protected $bootstrap;
 
 	/**
-	 * @var \TYPO3\ExtJS\ExtDirect\Request
+	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
 	 */
-	protected $request;
+	protected $objectManager;
+
+	/**
+	 * @var \TYPO3\FLOW3\Configuration\ConfigurationManager
+	 */
+	protected $configurationManager;
+
+	/**
+	 * @var \TYPO3\FLOW3\Mvc\Routing\RouterInterface
+	 */
+	protected $router;
+
+	/**
+	 * @var \TYPO3\FLOW3\Mvc\Dispatcher
+	 */
+	protected $dispatcher;
 
 	/**
 	 * Whether to expose exception information in an ExtDirect response
 	 * @var boolean
 	 */
 	protected $exposeExceptionInformation = FALSE;
-
-	/**
-	 * @var \TYPO3\FLOW3\Mvc\ActionRequest
-	 */
-	protected $requestOfCurrentTransaction;
-
-	/**
-	 * Constructor
-	 *
-	 * @param \TYPO3\FLOW3\Core\Bootstrap $bootstrap
-	 * @return void
-	 */
-	public function __construct(\TYPO3\FLOW3\Core\Bootstrap $bootstrap) {
-		$this->bootstrap = $bootstrap;
-	}
-
-	/**
-	 * Handles a raw Ext Direct request and sends the respsonse.
-	 *
-	 * @return void
-	 */
-	public function handleRequest() {
-		$sequence = $this->bootstrap->buildRuntimeSequence();
-		$sequence->invoke($this->bootstrap);
-
-		$objectManager = $this->bootstrap->getObjectManager();
-
-		$securityContext = $objectManager->get('TYPO3\FLOW3\Security\Context');
-
-		$this->request = $objectManager->get('TYPO3\ExtJS\ExtDirect\RequestBuilder')->build();
-		$dispatcher = $objectManager->get('TYPO3\FLOW3\MVC\Dispatcher');
-
-		$results = array();
-		foreach ($this->request->getTransactions() as $transaction) {
-			$requestOfCurrentTransaction = $transaction->buildRequest();
-			$this->requestOfCurrentTransaction = $requestOfCurrentTransaction;
-			$responseOfCurrentTransaction = $transaction->buildResponse();
-
-			$securityContext->initialize();
-
-			try {
-				$dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
-				$results[] = array(
-					'type' => 'rpc',
-					'tid' => $transaction->getTid(),
-					'action' => $transaction->getAction(),
-					'method' => $transaction->getMethod(),
-					'result' => $responseOfCurrentTransaction->getResult()
-				);
-			} catch (\Exception $exception) {
-				$systemLogger = $objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
-				$systemLogger->logException($exception);
-
-					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
-				$configurationManager = $objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
-				$settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
-				$exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
-
-				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
-				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
-				$results[] = array(
-					'type' => 'exception',
-					'tid' => $transaction->getTid(),
-					'message' => $exceptionMessage,
-					'where' => $exceptionWhere
-				);
-			}
-		}
-
-		$this->sendResponse($results, $this->request);
-		$this->bootstrap->shutdown('Runtime');
-	}
 
 	/**
 	 * Checks if the request handler can handle the current request.
@@ -128,16 +72,108 @@ class RequestHandler implements \TYPO3\FLOW3\Core\RequestHandlerInterface {
 	}
 
 	/**
-	 * Returns the request of the currently running transaction.
+	 * Handles a raw ExtDirect request and sends the response.
 	 *
-	 * WARNING: We do NOT return the top-level ExtDirect request here, as we want
-	 * Security to use the MVC Web Request, as the ExtDirectRequest just batches
-	 * numerous MVC requests for improving performance.
-	 *
-	 * @return \TYPO3\FLOW3\Mvc\RequestInterface The originally built web request
+	 * @return void
 	 */
-	public function getRequest() {
-		return $this->requestOfCurrentTransaction;
+	public function handleRequest() {
+		$this->boot();
+		$this->resolveDependencies();
+
+		$httpRequest = \TYPO3\FLOW3\Http\Request::createFromEnvironment();
+
+		$this->router->setRoutesConfiguration($this->routesConfiguration);
+		$extDirectRequest = $this->buildJsonRequest($httpRequest);
+
+		$results = array();
+		foreach ($extDirectRequest->getTransactions() as $transaction) {
+			$requestOfCurrentTransaction = $transaction->buildRequest($extDirectRequest);
+			$this->requestOfCurrentTransaction = $requestOfCurrentTransaction;
+			$responseOfCurrentTransaction = $transaction->buildResponse();
+
+			try {
+				$this->securityContext->injectRequest($requestOfCurrentTransaction);
+				$this->securityContext->initialize();
+
+				$this->dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
+				$results[] = array(
+					'type' => 'rpc',
+					'tid' => $transaction->getTid(),
+					'action' => $transaction->getAction(),
+					'method' => $transaction->getMethod(),
+					'result' => $responseOfCurrentTransaction->getResult()
+				);
+			} catch (\Exception $exception) {
+				$systemLogger = $this->objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
+				$systemLogger->logException($exception);
+
+					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
+				$configurationManager = $this->objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
+				$settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
+				$exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
+
+				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
+				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
+				$results[] = array(
+					'type' => 'exception',
+					'tid' => $transaction->getTid(),
+					'message' => $exceptionMessage,
+					'where' => $exceptionWhere
+				);
+			}
+		}
+
+		$this->sendResponse($results, $extDirectRequest);
+		$this->bootstrap->shutdown('Runtime');
+		$this->exit->__invoke();
+	}
+
+	/**
+	 * Builds a Json ExtDirect request by reading the transaction data from
+	 * the HTTP request body.
+	 *
+	 * @param \TYPO3\FLOW3\Http\Request $httpRequest The HTTP request
+	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
+	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
+	 */
+	protected function buildJsonRequest(\TYPO3\FLOW3\Http\Request $httpRequest) {
+		$transactionDatas = json_decode($httpRequest->getContent());
+		if ($transactionDatas === NULL) {
+			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException('The request is not a valid Ext Direct request', 1268490738);
+		}
+
+		if (!is_array($transactionDatas)) {
+			$transactionDatas = array($transactionDatas);
+		}
+
+		$extDirectRequest = new Request($httpRequest);
+		foreach ($transactionDatas as $transactionData) {
+			$extDirectRequest->createAndAddTransaction(
+				$transactionData->action,
+				$transactionData->method,
+				is_array($transactionData->data) ? $transactionData->data : array(),
+				$transactionData->tid
+			);
+		}
+		return $extDirectRequest;
+	}
+
+	/**
+	 * Resolves a few dependencies of this request handler which can't be resolved
+	 * automatically due to the early stage of the boot process this request handler
+	 * is invoked at.
+	 *
+	 * @return void
+	 */
+	protected function resolveDependencies() {
+		$this->objectManager = $this->bootstrap->getObjectManager();
+		$this->dispatcher = $this->objectManager->get('TYPO3\FLOW3\Mvc\Dispatcher');
+
+		$this->configurationManager = $this->objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
+		$this->routesConfiguration = $this->configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
+		$this->router = $this->objectManager->get('TYPO3\FLOW3\Mvc\Routing\Router');
+
+		$this->securityContext = $this->objectManager->get('TYPO3\FLOW3\Security\Context');
 	}
 
 	/**

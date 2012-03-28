@@ -35,7 +35,7 @@ class ViewTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 		$mockResponse = $this->getMock('TYPO3\ExtJS\ExtDirect\TransactionResponse');
 		$mockResponse->expects($this->atLeastOnce())->method('setResult')->with($expected);
 
-		$mockControllerContext = $this->getMock('TYPO3\FLOW3\MVC\Controller\ControllerContext', array('getResponse'), array(), '', FALSE);
+		$mockControllerContext = $this->getMock('TYPO3\FLOW3\Mvc\Controller\ControllerContext', array('getResponse'), array(), '', FALSE);
 		$mockControllerContext->expects($this->any())->method('getResponse')->will($this->returnValue($mockResponse));
 
 		$view = $this->getMock('TYPO3\ExtJS\ExtDirect\View', array('loadConfigurationFromYamlFile'));

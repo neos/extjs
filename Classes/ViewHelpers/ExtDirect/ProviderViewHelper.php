@@ -77,7 +77,7 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 		if (!empty($namespace)) {
 			$providerConfig['namespace'] = $namespace;
 		}
-		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('TYPO3\FLOW3\MVC\Controller\ControllerInterface');
+		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('TYPO3\FLOW3\Mvc\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
 			$methodNames = get_class_methods($controllerClassName);
 			foreach ($methodNames as $methodName) {
