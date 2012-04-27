@@ -57,7 +57,7 @@ class IncludeViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper 
 	 */
 	public function render($theme = 'xtheme-blue', $debug = NULL, $includeStylesheets = TRUE) {
 		if ($debug === NULL) {
-			$debug = ($this->objectManager->getContext() === 'Development') ?: FALSE;
+			$debug = ($this->objectManager->getContext()->isDevelopment()) ?: FALSE;
 		}
 		$baseUri = $this->resourcePublisher->getStaticResourcesWebBaseUri() . 'Packages/TYPO3.ExtJS/';
 		$output = '';
