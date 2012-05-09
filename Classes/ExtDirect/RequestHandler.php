@@ -77,13 +77,14 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	 * @return void
 	 */
 	public function handleRequest() {
+			// Create the request very early so the Resource Management has a chance to grab it:
+		$this->request = \TYPO3\FLOW3\Http\Request::createFromEnvironment();
+
 		$this->boot();
 		$this->resolveDependencies();
 
-		$httpRequest = \TYPO3\FLOW3\Http\Request::createFromEnvironment();
-
 		$this->router->setRoutesConfiguration($this->routesConfiguration);
-		$extDirectRequest = $this->buildJsonRequest($httpRequest);
+		$extDirectRequest = $this->buildJsonRequest($this->request);
 
 		$results = array();
 		foreach ($extDirectRequest->getTransactions() as $transaction) {
@@ -134,7 +135,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	 *
 	 * @param \TYPO3\FLOW3\Http\Request $httpRequest The HTTP request
 	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
-	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtRequestException
+	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException
 	 */
 	protected function buildJsonRequest(\TYPO3\FLOW3\Http\Request $httpRequest) {
 		$transactionDatas = json_decode($httpRequest->getContent());
