@@ -27,14 +27,9 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	protected $bootstrap;
 
 	/**
-	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
+	 * @var \TYPO3\FLOW3\Log\SystemLoggerInterface
 	 */
-	protected $objectManager;
-
-	/**
-	 * @var \TYPO3\FLOW3\Configuration\ConfigurationManager
-	 */
-	protected $configurationManager;
+	protected $systemLogger;
 
 	/**
 	 * @var \TYPO3\FLOW3\Mvc\Routing\RouterInterface
@@ -105,12 +100,9 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 					'result' => $responseOfCurrentTransaction->getResult()
 				);
 			} catch (\Exception $exception) {
-				$systemLogger = $this->objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
-				$systemLogger->logException($exception);
+				$this->systemLogger->logException($exception);
 
 					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
-				$configurationManager = $this->objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
-				$settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
 				$exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
 
 				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
@@ -167,14 +159,13 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	 * @return void
 	 */
 	protected function resolveDependencies() {
-		$this->objectManager = $this->bootstrap->getObjectManager();
-		$this->dispatcher = $this->objectManager->get('TYPO3\FLOW3\Mvc\Dispatcher');
+		parent::resolveDependencies();
 
-		$this->configurationManager = $this->objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
-		$this->routesConfiguration = $this->configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_ROUTES);
-		$this->router = $this->objectManager->get('TYPO3\FLOW3\Mvc\Routing\Router');
+		$objectManager = $this->bootstrap->getObjectManager();
+		$this->systemLogger = $objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
 
-		$this->securityContext = $this->objectManager->get('TYPO3\FLOW3\Security\Context');
+		$configurationManager = $objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
+		$this->settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
 	}
 
 	/**
