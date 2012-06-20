@@ -103,7 +103,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 				$this->systemLogger->logException($exception);
 
 					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
-				$exposeExceptionInformation = ($settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
+				$exposeExceptionInformation = ($this->settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
 
 				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
 				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
