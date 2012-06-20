@@ -106,7 +106,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 				$exposeExceptionInformation = ($this->settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
 
 				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
-				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere : 'An internal error occured';
+				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere . ' - ' . $exception->getMessage() : 'An internal error occured';
 				$results[] = array(
 					'type' => 'exception',
 					'tid' => $transaction->getTid(),
