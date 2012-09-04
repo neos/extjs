@@ -88,7 +88,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 			$responseOfCurrentTransaction = $transaction->buildResponse();
 
 			try {
-				$this->securityContext->injectRequest($requestOfCurrentTransaction);
+				$this->securityContext->setRequest($requestOfCurrentTransaction);
 				$this->securityContext->initialize();
 
 				$this->dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
