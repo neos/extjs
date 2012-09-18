@@ -10,7 +10,8 @@ rm -f $TARGET_FILENAME
 # Use source files from ext-3.4.0 bundle and move files from root / src and src/ext-core/src
 
 cat $SRC_PATH/adapter/ext/ext-base-debug.js >> $TARGET_FILENAME
-cat $SRC_PATH/core/Ext-more.js >> $TARGET_FILENAME
+cat $SRC_PATH/core/EventManager.js >> $TARGET_FILENAME
+cat $SRC_PATH/core/Ext.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/Observable.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/DelayedTask.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/JSON.js >> $TARGET_FILENAME
