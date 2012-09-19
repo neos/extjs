@@ -13,6 +13,9 @@ cat $SRC_PATH/adapter/ext/ext-base-debug.js >> $TARGET_FILENAME
 cat $SRC_PATH/core/Ext-more.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/Observable.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/DelayedTask.js >> $TARGET_FILENAME
+cat $SRC_PATH/core/Element.js >> $TARGET_FILENAME
+cat $SRC_PATH/core/Element.style.js >> $TARGET_FILENAME
+cat $SRC_PATH/core/EventManager.js >> $TARGET_FILENAME
 cat $SRC_PATH/util/JSON.js >> $TARGET_FILENAME
 cat $SRC_PATH/direct/Direct.js >> $TARGET_FILENAME
 cat $SRC_PATH/direct/Provider.js >> $TARGET_FILENAME
