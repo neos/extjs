@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS;
 
 /*                                                                        *
- * This script belongs to the FLOW3 framework.                            *
+ * This script belongs to the FLOW3 package "TYPO3.ExtJS".                *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -18,6 +18,7 @@ use \TYPO3\FLOW3\Package\Package as BasePackage;
  *
  */
 class Package extends BasePackage {
+
 	/**
 	 * Invokes custom PHP code directly after the package manager has been initialized.
 	 *
