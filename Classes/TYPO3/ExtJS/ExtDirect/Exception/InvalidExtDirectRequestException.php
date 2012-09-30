@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ExtDirect\Exception;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -15,7 +15,7 @@ namespace TYPO3\ExtJS\ExtDirect\Exception;
  * An exception for an invalid Ext Direct request
  *
  */
-class InvalidExtDirectRequestException extends \TYPO3\FLOW3\Exception {
+class InvalidExtDirectRequestException extends \TYPO3\Flow\Exception {
 
 }
 ?>

@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ViewHelpers\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,7 +11,7 @@ namespace TYPO3\ExtJS\ViewHelpers\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
  * Ext Direct Provider view helper
@@ -21,7 +21,7 @@ use TYPO3\FLOW3\Annotations as FLOW3;
 class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
-	 * @var \TYPO3\FLOW3\Reflection\ReflectionService
+	 * @var \TYPO3\Flow\Reflection\ReflectionService
 	 */
 	protected $localReflectionService;
 
@@ -31,20 +31,20 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 	 * A _private_ property "reflectionService" already exists in the AbstractViewHelper,
 	 * therefore we need to switch to another property name.
 	 *
-	 * @param \TYPO3\FLOW3\Reflection\ReflectionService $reflectionService Reflection service
+	 * @param \TYPO3\Flow\Reflection\ReflectionService $reflectionService Reflection service
 	 * @return void
 	 */
-	public function injectLocalReflectionService(\TYPO3\FLOW3\Reflection\ReflectionService $reflectionService) {
+	public function injectLocalReflectionService(\TYPO3\Flow\Reflection\ReflectionService $reflectionService) {
 		$this->localReflectionService = $reflectionService;
 	}
 
 	/**
 	 * Injects the security context
 	 *
-	 * @param \TYPO3\FLOW3\Security\Context $securityContext The security context
+	 * @param \TYPO3\Flow\Security\Context $securityContext The security context
 	 * @return void
 	 */
-	public function injectSecurityContext(\TYPO3\FLOW3\Security\Context $securityContext) {
+	public function injectSecurityContext(\TYPO3\Flow\Security\Context $securityContext) {
 		$this->securityContext = $securityContext;
 	}
 
@@ -77,7 +77,7 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 		if (!empty($namespace)) {
 			$providerConfig['namespace'] = $namespace;
 		}
-		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('TYPO3\FLOW3\Mvc\Controller\ControllerInterface');
+		$controllerClassNames = $this->localReflectionService->getAllImplementationClassNamesForInterface('TYPO3\Flow\Mvc\Controller\ControllerInterface');
 		foreach ($controllerClassNames as $controllerClassName) {
 			$methodNames = get_class_methods($controllerClassName);
 			foreach ($methodNames as $methodName) {

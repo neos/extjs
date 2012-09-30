@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the package TYPO3.ExtJS.                        *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,69 +11,69 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
  * An aspect which cares for CSRF protection of links used in the ExtDirect service.
  *
- * @FLOW3\Aspect
+ * @Flow\Aspect
  */
 class CsrfProtectionAspect {
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Object\ObjectManagerInterface
 	 */
 	protected $objectManager;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Reflection\ReflectionService
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Reflection\ReflectionService
 	 */
 	protected $reflectionService;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Security\Context
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Security\Context
 	 */
 	protected $securityContext;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Security\Policy\PolicyService
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Security\Policy\PolicyService
 	 */
 	protected $policyService;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Core\Bootstrap
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Core\Bootstrap
 	 */
 	protected $bootstrap;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Security\Authentication\AuthenticationManagerInterface
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Security\Authentication\AuthenticationManagerInterface
 	 */
 	protected $authenticationManager;
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Mvc\Routing\RouterInterface
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Mvc\Routing\RouterInterface
 	 */
 	protected $router;
 
 	/**
 	 * Adds a CSRF token as argument in ExtDirect requests
 	 *
-	 * @FLOW3\Around("method(TYPO3\ExtJS\ExtDirect\Transaction->buildRequest()) && setting(TYPO3.FLOW3.security.enable)")
-	 * @param \TYPO3\FLOW3\Aop\JoinPointInterface $joinPoint The current join point
-	 * @return \TYPO3\FLOW3\Mvc\ActionRequest
+	 * @Flow\Around("method(TYPO3\ExtJS\ExtDirect\Transaction->buildRequest()) && setting(TYPO3.Flow.security.enable)")
+	 * @param \TYPO3\Flow\Aop\JoinPointInterface $joinPoint The current join point
+	 * @return \TYPO3\Flow\Mvc\ActionRequest
 	 */
-	public function transferCsrfTokenToExtDirectRequests(\TYPO3\FLOW3\Aop\JoinPointInterface $joinPoint) {
+	public function transferCsrfTokenToExtDirectRequests(\TYPO3\Flow\Aop\JoinPointInterface $joinPoint) {
 		$extDirectRequest = $joinPoint->getAdviceChain()->proceed($joinPoint);
 
 		$requestHandler = $this->bootstrap->getActiveRequestHandler();
-		if ($requestHandler instanceof \TYPO3\FLOW3\Http\HttpRequestHandlerInterface) {
+		if ($requestHandler instanceof \TYPO3\Flow\Http\HttpRequestHandlerInterface) {
 			$arguments = $requestHandler->getHttpRequest()->getArguments();
 			if (isset($arguments['__csrfToken'])) {
 				$requestArguments = $extDirectRequest->getMainRequest()->getArguments();

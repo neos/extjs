@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,13 +11,13 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
  * An Ext Direct request
  *
  */
-class Request extends \TYPO3\FLOW3\Mvc\ActionRequest {
+class Request extends \TYPO3\Flow\Mvc\ActionRequest {
 
 	/**
 	 * The transactions inside this request
@@ -43,9 +43,9 @@ class Request extends \TYPO3\FLOW3\Mvc\ActionRequest {
 	/**
 	 * Creates an Ext Direct Transaction and adds it to the request instance.
 	 *
-	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
-	 * @param string $method The "method" – the "action name" in FLOW3 terms
-	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
+	 * @param string $action The "action" – the "controller object name" in Flow terms
+	 * @param string $method The "method" – the "action name" in Flow terms
+	 * @param array $data Numeric array of arguments which are eventually passed to the Flow action method
 	 * @param mixed $tid The ExtDirect transaction id
 	 * @return void
 	 */

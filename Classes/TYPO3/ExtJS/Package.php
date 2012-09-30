@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "TYPO3.ExtJS".                *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,7 +11,7 @@ namespace TYPO3\ExtJS;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use \TYPO3\FLOW3\Package\Package as BasePackage;
+use \TYPO3\Flow\Package\Package as BasePackage;
 
 /**
  * The ExtJS Package
@@ -22,10 +22,10 @@ class Package extends BasePackage {
 	/**
 	 * Invokes custom PHP code directly after the package manager has been initialized.
 	 *
-	 * @param \TYPO3\FLOW3\Core\Bootstrap $bootstrap The current bootstrap
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap The current bootstrap
 	 * @return void
 	 */
-	public function boot(\TYPO3\FLOW3\Core\Bootstrap $bootstrap) {
+	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		$bootstrap->registerRequestHandler(new \TYPO3\ExtJS\ExtDirect\RequestHandler($bootstrap));
 	}
 }

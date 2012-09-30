@@ -13,7 +13,7 @@
   <info>
     <abstract>
       <para>ExtJS is a JavaScript framework. The ExtJS Package makes it
-      available as a FLOW3 package and adds some view helpers to ease
+      available as a TYPO3 Flow package and adds some view helpers to ease
       inclusion on Fluid templates.</para>
     </abstract>
 

@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,33 +11,33 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
-use TYPO3\FLOW3\Configuration\ConfigurationManager;
+use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Configuration\ConfigurationManager;
 
 /**
  * The ExtDirect request handler
  *
- * @FLOW3\Scope("singleton")
+ * @Flow\Scope("singleton")
  */
-class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
+class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 
 	/**
-	 * @var \TYPO3\FLOW3\Core\Bootstrap
+	 * @var \TYPO3\Flow\Core\Bootstrap
 	 */
 	protected $bootstrap;
 
 	/**
-	 * @var \TYPO3\FLOW3\Log\SystemLoggerInterface
+	 * @var \TYPO3\Flow\Log\SystemLoggerInterface
 	 */
 	protected $systemLogger;
 
 	/**
-	 * @var \TYPO3\FLOW3\Mvc\Routing\RouterInterface
+	 * @var \TYPO3\Flow\Mvc\Routing\RouterInterface
 	 */
 	protected $router;
 
 	/**
-	 * @var \TYPO3\FLOW3\Mvc\Dispatcher
+	 * @var \TYPO3\Flow\Mvc\Dispatcher
 	 */
 	protected $dispatcher;
 
@@ -73,7 +73,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	 */
 	public function handleRequest() {
 			// Create the request very early so the Resource Management has a chance to grab it:
-		$this->request = \TYPO3\FLOW3\Http\Request::createFromEnvironment();
+		$this->request = \TYPO3\Flow\Http\Request::createFromEnvironment();
 
 		$this->boot();
 		$this->resolveDependencies();
@@ -105,7 +105,7 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
 				$exposeExceptionInformation = ($this->settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
 
-				$exceptionWhere = ($exception instanceof \TYPO3\FLOW3\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
+				$exceptionWhere = ($exception instanceof \TYPO3\Flow\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
 				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere . ' - ' . $exception->getMessage() : 'An internal error occured';
 				$results[] = array(
 					'type' => 'exception',
@@ -125,11 +125,11 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 	 * Builds a Json ExtDirect request by reading the transaction data from
 	 * the HTTP request body.
 	 *
-	 * @param \TYPO3\FLOW3\Http\Request $httpRequest The HTTP request
+	 * @param \TYPO3\Flow\Http\Request $httpRequest The HTTP request
 	 * @return \TYPO3\ExtJS\ExtDirect\Request The Ext Direct request object
 	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException
 	 */
-	protected function buildJsonRequest(\TYPO3\FLOW3\Http\Request $httpRequest) {
+	protected function buildJsonRequest(\TYPO3\Flow\Http\Request $httpRequest) {
 		$transactionDatas = json_decode($httpRequest->getContent());
 		if ($transactionDatas === NULL) {
 			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException('The request is not a valid Ext Direct request', 1268490738);
@@ -162,10 +162,10 @@ class RequestHandler extends \TYPO3\FLOW3\Http\RequestHandler {
 		parent::resolveDependencies();
 
 		$objectManager = $this->bootstrap->getObjectManager();
-		$this->systemLogger = $objectManager->get('TYPO3\FLOW3\Log\SystemLoggerInterface');
+		$this->systemLogger = $objectManager->get('TYPO3\Flow\Log\SystemLoggerInterface');
 
-		$configurationManager = $objectManager->get('TYPO3\FLOW3\Configuration\ConfigurationManager');
-		$this->settings = $configurationManager->getConfiguration(\TYPO3\FLOW3\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
+		$configurationManager = $objectManager->get('TYPO3\Flow\Configuration\ConfigurationManager');
+		$this->settings = $configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
 	}
 
 	/**

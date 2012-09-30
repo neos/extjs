@@ -2,7 +2,7 @@
 namespace TYPO3\ExtJS\ExtDirect;
 
 /*                                                                        *
- * This script belongs to the FLOW3 package "ExtJS".                      *
+ * This script belongs to the TYPO3 Flow package "TYPO3.ExtJS".           *
  *                                                                        *
  * It is free software; you can redistribute it and/or modify it under    *
  * the terms of the GNU Lesser General Public License, either version 3   *
@@ -11,7 +11,7 @@ namespace TYPO3\ExtJS\ExtDirect;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
  * An Ext Direct transaction
@@ -20,8 +20,8 @@ use TYPO3\FLOW3\Annotations as FLOW3;
 class Transaction {
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Reflection\ReflectionService
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Reflection\ReflectionService
 	 */
 	protected $reflectionService;
 
@@ -64,9 +64,9 @@ class Transaction {
 	 * Constructs the Transaction
 	 *
 	 * @param \TYPO3\ExtJS\ExtDirect\Request $request The direct request this transaction belongs to
-	 * @param string $action The "action" – the "controller object name" in FLOW3 terms
-	 * @param string $method The "method" – the "action name" in FLOW3 terms
-	 * @param array $data Numeric array of arguments which are eventually passed to the FLOW3 action method
+	 * @param string $action The "action" – the "controller object name" in Flow terms
+	 * @param string $method The "method" – the "action name" in Flow terms
+	 * @param array $data Numeric array of arguments which are eventually passed to the Flow action method
 	 * @param mixed $tid The ExtDirect transaction id
 	 */
 	public function __construct(\TYPO3\ExtJS\ExtDirect\Request $request, $action, $method, array $data, $tid) {
@@ -81,10 +81,10 @@ class Transaction {
 	 * Build a web request for dispatching this Ext Direct transaction
 	 *
 	 * @param \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest
-	 * @return \TYPO3\FLOW3\Mvc\ActionRequest A web request for this transaction
+	 * @return \TYPO3\Flow\Mvc\ActionRequest A web request for this transaction
 	 */
 	public function buildRequest(\TYPO3\ExtJS\ExtDirect\Request $extDirectRequest) {
-		$request = new \TYPO3\FLOW3\Mvc\ActionRequest($extDirectRequest);
+		$request = new \TYPO3\Flow\Mvc\ActionRequest($extDirectRequest);
 		$request->setControllerObjectName($this->getControllerObjectName());
 		$request->setControllerActionName($this->getMethod());
 		$request->setFormat('extdirect');
