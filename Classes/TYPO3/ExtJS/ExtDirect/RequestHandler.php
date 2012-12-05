@@ -13,6 +13,7 @@ namespace TYPO3\ExtJS\ExtDirect;
 
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Configuration\ConfigurationManager;
+use TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException;
 
 /**
  * The ExtDirect request handler
@@ -22,24 +23,9 @@ use TYPO3\Flow\Configuration\ConfigurationManager;
 class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 
 	/**
-	 * @var \TYPO3\Flow\Core\Bootstrap
-	 */
-	protected $bootstrap;
-
-	/**
 	 * @var \TYPO3\Flow\Log\SystemLoggerInterface
 	 */
 	protected $systemLogger;
-
-	/**
-	 * @var \TYPO3\Flow\Mvc\Routing\RouterInterface
-	 */
-	protected $router;
-
-	/**
-	 * @var \TYPO3\Flow\Mvc\Dispatcher
-	 */
-	protected $dispatcher;
 
 	/**
 	 * Whether to expose exception information in an ExtDirect response
@@ -74,49 +60,47 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	public function handleRequest() {
 			// Create the request very early so the Resource Management has a chance to grab it:
 		$this->request = \TYPO3\Flow\Http\Request::createFromEnvironment();
+		$this->response = new \TYPO3\Flow\Http\Response();
 
 		$this->boot();
 		$this->resolveDependencies();
+		$this->request->injectSettings($this->settings);
 
 		$this->router->setRoutesConfiguration($this->routesConfiguration);
-		$extDirectRequest = $this->buildJsonRequest($this->request);
 
-		$results = array();
-		foreach ($extDirectRequest->getTransactions() as $transaction) {
-			$requestOfCurrentTransaction = $transaction->buildRequest($extDirectRequest);
-			$this->requestOfCurrentTransaction = $requestOfCurrentTransaction;
-			$responseOfCurrentTransaction = $transaction->buildResponse();
+		try {
+			$extDirectRequest = $this->buildJsonRequest($this->request);
 
-			try {
-				$this->securityContext->setRequest($requestOfCurrentTransaction);
-				$this->securityContext->initialize();
+			$results = array();
+			foreach ($extDirectRequest->getTransactions() as $transaction) {
+				$requestOfCurrentTransaction = $transaction->buildRequest($extDirectRequest);
+				$responseOfCurrentTransaction = $transaction->buildResponse();
 
-				$this->dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
-				$results[] = array(
-					'type' => 'rpc',
-					'tid' => $transaction->getTid(),
-					'action' => $transaction->getAction(),
-					'method' => $transaction->getMethod(),
-					'result' => $responseOfCurrentTransaction->getResult()
-				);
-			} catch (\Exception $exception) {
-				$this->systemLogger->logException($exception);
+				try {
+					$this->securityContext->setRequest($requestOfCurrentTransaction);
+					$this->securityContext->initialize();
 
-					// As an exception happened, we now need to check whether detailed exception reporting was enabled.
-				$exposeExceptionInformation = ($this->settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
-
-				$exceptionWhere = ($exception instanceof \TYPO3\Flow\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
-				$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere . ' - ' . $exception->getMessage() : 'An internal error occured';
-				$results[] = array(
-					'type' => 'exception',
-					'tid' => $transaction->getTid(),
-					'message' => $exceptionMessage,
-					'where' => $exceptionWhere
-				);
+					$this->dispatcher->dispatch($requestOfCurrentTransaction, $responseOfCurrentTransaction);
+					$results[] = array(
+						'type' => 'rpc',
+						'tid' => $transaction->getTid(),
+						'action' => $transaction->getAction(),
+						'method' => $transaction->getMethod(),
+						'result' => $responseOfCurrentTransaction->getResult()
+					);
+				} catch (\Exception $exception) {
+					$results[] = $this->handleException($exception, $transaction->getTid());
+				}
 			}
+			$this->prepareResponse($results, $extDirectRequest);
+		} catch (InvalidExtDirectRequestException $exception) {
+			$results[] = $this->handleException($exception);
+			$this->prepareResponse($results);
 		}
 
-		$this->sendResponse($results, $extDirectRequest);
+		$this->response->makeStandardsCompliant($this->request);
+		$this->response->send();
+
 		$this->bootstrap->shutdown('Runtime');
 		$this->exit->__invoke();
 	}
@@ -130,22 +114,22 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	 * @throws \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException
 	 */
 	protected function buildJsonRequest(\TYPO3\Flow\Http\Request $httpRequest) {
-		$transactionDatas = json_decode($httpRequest->getContent());
-		if ($transactionDatas === NULL) {
+		$allTransactionData = json_decode($httpRequest->getContent());
+		if ($allTransactionData === NULL) {
 			throw new \TYPO3\ExtJS\ExtDirect\Exception\InvalidExtDirectRequestException('The request is not a valid Ext Direct request', 1268490738);
 		}
 
-		if (!is_array($transactionDatas)) {
-			$transactionDatas = array($transactionDatas);
+		if (!is_array($allTransactionData)) {
+			$allTransactionData = array($allTransactionData);
 		}
 
 		$extDirectRequest = new Request($httpRequest);
-		foreach ($transactionDatas as $transactionData) {
+		foreach ($allTransactionData as $singleTransactionData) {
 			$extDirectRequest->createAndAddTransaction(
-				$transactionData->action,
-				$transactionData->method,
-				is_array($transactionData->data) ? $transactionData->data : array(),
-				$transactionData->tid
+				$singleTransactionData->action,
+				$singleTransactionData->method,
+				is_array($singleTransactionData->data) ? $singleTransactionData->data : array(),
+				$singleTransactionData->tid
 			);
 		}
 		return $extDirectRequest;
@@ -169,21 +153,45 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	}
 
 	/**
-	 * Sends the response
+	 * Prepares the response by setting content and content type as needed.
 	 *
 	 * @param array $results The collected results from the transaction requests
 	 * @param \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest
 	 * @return void
 	 */
-	protected function sendResponse(array $results, \TYPO3\ExtJS\ExtDirect\Request $extDirectRequest) {
-		$response = json_encode(count($results) === 1 ? $results[0] : $results);
-		if ($extDirectRequest->isFormPost() && $extDirectRequest->isFileUpload()) {
-			header('Content-Type: text/html');
-			echo '<html><body><textarea>' . $response . '</textarea></body></html>';
+	protected function prepareResponse(array $results, Request $extDirectRequest = NULL) {
+		$responseData = json_encode(count($results) === 1 ? $results[0] : $results);
+		if ($extDirectRequest !== NULL && $extDirectRequest->isFormPost() && $extDirectRequest->isFileUpload()) {
+			$this->response->setContent('<html><body><textarea>' . $responseData . '</textarea></body></html>');
 		} else {
-			header('Content-Type: text/javascript');
-			echo $response;
+			$this->response->setHeader('Content-Type', 'text/javascript');
+			$this->response->setContent($responseData);
 		}
+	}
+
+	/**
+	 * Return an array with data from the given exception, suitable for being returned
+	 * in an ExtDirect response.
+	 *
+	 * The excpetion is logged to the system logger as well.
+	 *
+	 * @param \Exception $exception
+	 * @return array
+	 */
+	protected function handleException(\Exception $exception, $transactionId = NULL) {
+		$this->systemLogger->logException($exception);
+
+			// As an exception happened, we now need to check whether detailed exception reporting was enabled.
+		$exposeExceptionInformation = ($this->settings['ExtDirect']['exposeExceptionInformation'] === TRUE);
+
+		$exceptionWhere = ($exception instanceof \TYPO3\Flow\Exception) ? ' (ref ' . $exception->getReferenceCode() . ')' : '';
+		$exceptionMessage = $exposeExceptionInformation ? 'Uncaught exception #' . $exception->getCode() . $exceptionWhere . ' - ' . $exception->getMessage() : 'An internal error occured';
+		return array(
+			'type' => 'exception',
+			'tid' => $transactionId,
+			'message' => $exceptionMessage,
+			'where' => $exceptionWhere
+		);
 	}
 }
 ?>
