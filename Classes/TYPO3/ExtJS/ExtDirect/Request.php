@@ -102,4 +102,3 @@ class Request extends \TYPO3\Flow\Mvc\ActionRequest {
 	}
 
 }
-?>

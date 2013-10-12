@@ -28,5 +28,3 @@ class Package extends BasePackage {
 		$bootstrap->registerRequestHandler(new \TYPO3\ExtJS\ExtDirect\RequestHandler($bootstrap));
 	}
 }
-
-?>

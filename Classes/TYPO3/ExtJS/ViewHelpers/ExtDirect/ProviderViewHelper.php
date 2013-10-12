@@ -103,5 +103,3 @@ class ProviderViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper
 		return 'Ext.Direct.addProvider(' . json_encode($providerConfig) . ');' . chr(10);
 	}
 }
-
-?>

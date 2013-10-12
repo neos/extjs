@@ -18,4 +18,3 @@ namespace TYPO3\ExtJS\ExtDirect\Exception;
 class InvalidExtDirectRequestException extends \TYPO3\Flow\Exception {
 
 }
-?>

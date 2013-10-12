@@ -71,4 +71,3 @@ class TransactionResponse extends \TYPO3\Flow\Http\Response {
 		return $this->success;
 	}
 }
-?>

@@ -52,4 +52,3 @@ class View extends \TYPO3\Flow\Mvc\View\JsonView {
 		));
 	}
 }
-?>

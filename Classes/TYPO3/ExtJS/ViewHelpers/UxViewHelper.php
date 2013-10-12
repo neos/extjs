@@ -48,5 +48,3 @@ class UxViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 ';
 	}
 }
-
-?>

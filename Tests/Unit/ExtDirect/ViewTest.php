@@ -48,4 +48,3 @@ class ViewTest extends \TYPO3\Flow\Tests\UnitTestCase {
 		$view->render();
 	}
 }
-?>

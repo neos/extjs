@@ -18,5 +18,3 @@ use Doctrine\Common\Annotations\Annotation as DoctrineAnnotation;
  * @DoctrineAnnotation\Target("METHOD")
  */
 final class ExtDirect {}
-
-?>

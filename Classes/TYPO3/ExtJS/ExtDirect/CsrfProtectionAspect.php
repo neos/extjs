@@ -85,5 +85,3 @@ class CsrfProtectionAspect {
 		return $extDirectRequest;
 	}
 }
-
-?>
