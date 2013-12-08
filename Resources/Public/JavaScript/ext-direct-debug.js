@@ -1,9 +1,23 @@
-/*!
- * Ext JS Library 3.3.1
- * Copyright(c) 2006-2010 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 // for old browsers
 window.undefined = window.undefined;
 
@@ -18,11 +32,11 @@ Ext = {
      * The version of the framework
      * @type String
      */
-    version : '3.3.1',
+    version : '3.4.1.1',
     versionDetail : {
         major : 3,
-        minor : 3,
-        patch : 1
+        minor : 4,
+        patch : 1.1
     }
 };
 
@@ -65,18 +79,81 @@ Ext.apply = function(o, c, defaults){
         isSafari3 = isSafari && check(/version\/3/),
         isSafari4 = isSafari && check(/version\/4/),
         isIE = !isOpera && check(/msie/),
-        isIE7 = isIE && (check(/msie 7/) || docMode == 7),
-        isIE8 = isIE && (check(/msie 8/) && docMode != 7),
-        isIE6 = isIE && !isIE7 && !isIE8,
+        isIE7 = isIE && ((check(/msie 7/) && docMode != 8 && docMode != 9 && docMode != 10) || docMode == 7),
+        isIE8 = isIE && ((check(/msie 8/) && docMode != 7 && docMode != 9 && docMode != 10) || docMode == 8),
+        isIE9 = isIE && ((check(/msie 9/) && docMode != 7 && docMode != 8 && docMode != 10) || docMode == 9),
+        isIE10 = isIE && ((check(/msie 10/) && docMode != 7 && docMode != 8 && docMode != 9) || docMode == 10),
+        isIE6 = isIE && check(/msie 6/),
+        isIE9m = isIE && (isIE6 || isIE7 || isIE8 || isIE9),
         isGecko = !isWebKit && check(/gecko/),
         isGecko2 = isGecko && check(/rv:1\.8/),
         isGecko3 = isGecko && check(/rv:1\.9/),
-        isBorderBox = isIE && !isStrict,
+        isBorderBox = isIE9m && !isStrict,
         isWindows = check(/windows|win32/),
         isMac = check(/macintosh|mac os x/),
         isAir = check(/adobeair/),
         isLinux = check(/linux/),
-        isSecure = /^https/i.test(window.location.protocol);
+        isSecure = /^https/i.test(window.location.protocol),
+        noArgs = [],
+        nonEnumerables = [],
+        emptyFn = Ext.emptyFn,
+        t = Ext.apply({}, {
+            constructor: emptyFn,
+            toString: emptyFn,
+            valueOf: emptyFn
+        }),
+        callOverrideParent = function () {
+            var method = callOverrideParent.caller.caller; // skip callParent (our caller)
+            return method.$owner.prototype[method.$name].apply(this, arguments);
+        };
+
+    if (t.constructor !== emptyFn) {
+        nonEnumerables.push('constructor');
+    }
+    if (t.toString !== emptyFn) {
+        nonEnumerables.push('toString');
+    }
+    if (t.valueOf !== emptyFn) {
+        nonEnumerables.push('valueOf');
+    }
+    if (!nonEnumerables.length) {
+        nonEnumerables = null;
+    }
+
+    // Create the abstract Base class to provide an empty constructor and callParent implementations
+    function Base () {
+        //
+    }
+
+    Ext.apply(Base, {
+        $isClass: true,
+
+        callParent: function (args) {
+            var method;
+
+            // This code is intentionally inlined for the least number of debugger stepping
+            return (method = this.callParent.caller) && (method.$previous ||
+                ((method = method.$owner ? method : method.caller) &&
+                        method.$owner.superclass.self[method.$name])).apply(this, args || noArgs);
+        }
+    });
+
+    Base.prototype = {
+        constructor: function() {
+        },
+        callParent: function(args) {
+            // NOTE: this code is deliberately as few expressions (and no function calls)
+            // as possible so that a debugger can skip over this noise with the minimum number
+            // of steps. Basically, just hit Step Into until you are where you really wanted
+            // to be.
+            var method,
+                superMethod = (method = this.callParent.caller) && (method.$previous ||
+                        ((method = method.$owner ? method : method.caller) &&
+                                method.$owner.superclass[method.$name]));
+
+            return superMethod.apply(this, args || noArgs);
+        }
+    };
 
     // remove css image flicker
     if(isIE6){
@@ -269,29 +346,375 @@ MyGridPanel = Ext.extend(Ext.grid.GridPanel, {
             };
         }(),
 
+        global: (function () {
+            return this;
+        })(),
+
+        Base: Base,
+
+        namespaceCache: {},
+
+        createNamespace: function (namespaceOrClass, isClass) {
+            var cache = Ext.namespaceCache,
+                namespace = isClass ? namespaceOrClass.substring(0, namespaceOrClass.lastIndexOf('.'))
+                            : namespaceOrClass,
+                ns = cache[namespace],
+                i, n, part, parts, partials;
+
+            if (!ns) {
+                ns = Ext.global;
+                if (namespace) {
+                    partials = [];
+                    parts = namespace.split('.');
+
+                    for (i = 0, n = parts.length; i < n; ++i) {
+                        part = parts[i];
+
+                        ns = ns[part] || (ns[part] = {});
+                        partials.push(part);
+
+                        cache[partials.join('.')] = ns; // build up prefixes as we go
+                    }
+                }
+            }
+
+            return ns;
+        },
+
+        getClassByName: function (className) {
+            var parts = className.split('.'),
+                cls = Ext.global,
+                n = parts.length,
+                i;
+
+            for (i = 0; cls && i < n; ++i) {
+                cls = cls[parts[i]];
+            }
+
+            return cls || null;
+        },
+
+        addMembers: function (cls, target, members, handleNonEnumerables) {
+            var i, name, member;
+
+            for (name in members) {
+                if (members.hasOwnProperty(name)) {
+                    member = members[name];
+                    if (typeof member == 'function') {
+                        member.$owner = cls;
+                        member.$name = name;
+                    }
+
+                    target[name] = member;
+                }
+            }
+
+            if (handleNonEnumerables && nonEnumerables) {
+                for (i = nonEnumerables.length; i-- > 0; ) {
+                    name = nonEnumerables[i];
+                    if (members.hasOwnProperty(name)) {
+                        member = members[name];
+                        if (typeof member == 'function') {
+                            member.$owner = cls;
+                            member.$name = name;
+                        }
+
+                        target[name] = member;
+                    }
+                }
+            }
+        },
+
         /**
-         * Adds a list of functions to the prototype of an existing class, overwriting any existing methods with the same name.
-         * Usage:<pre><code>
-Ext.override(MyClass, {
-    newMethod1: function(){
-        // etc.
-    },
-    newMethod2: function(foo){
-        // etc.
-    }
-});
-</code></pre>
-         * @param {Object} origclass The class to override
-         * @param {Object} overrides The list of functions to add to origClass.  This should be specified as an object literal
-         * containing one or more methods.
+         * @method
+         * Defines a class or override. A basic class is defined like this:
+         *
+         *      Ext.define('My.awesome.Class', {
+         *          someProperty: 'something',
+         *
+         *          someMethod: function(s) {
+         *              alert(s + this.someProperty);
+         *          }
+         *
+         *          ...
+         *      });
+         *
+         *      var obj = new My.awesome.Class();
+         *
+         *      obj.someMethod('Say '); // alerts 'Say something'
+         *
+         * To create an anonymous class, pass `null` for the `className`:
+         * 
+         *      Ext.define(null, {
+         *          constructor: function () {
+         *              // ...
+         *          }
+         *      });
+         *
+         * In some cases, it is helpful to create a nested scope to contain some private
+         * properties. The best way to do this is to pass a function instead of an object
+         * as the second parameter. This function will be called to produce the class
+         * body:
+         * 
+         *      Ext.define('MyApp.foo.Bar', function () {
+         *          var id = 0;
+         *          
+         *          return {
+         *              nextId: function () {
+         *                  return ++id;
+         *              }
+         *          };
+         *      });
+         * 
+         * When using this form of `Ext.define`, the function is passed a reference to its
+         * class. This can be used as an efficient way to access any static properties you
+         * may have:
+         * 
+         *      Ext.define('MyApp.foo.Bar', function (Bar) {
+         *          return {
+         *              statics: {
+         *                  staticMethod: function () {
+         *                      // ...
+         *                  }
+         *              },
+         *              
+         *              method: function () {
+         *                  return Bar.staticMethod();
+         *              }
+         *          };
+         *      });
+         *
+         * To define an override, include the `override` property. The content of an
+         * override is aggregated with the specified class in order to extend or modify
+         * that class. This can be as simple as setting default property values or it can
+         * extend and/or replace methods. This can also extend the statics of the class.
+         *
+         * One use for an override is to break a large class into manageable pieces.
+         *
+         *      // File: /src/app/Panel.js
+         *
+         *      Ext.define('My.app.Panel', {
+         *          extend: 'Ext.panel.Panel',
+         *
+         *          constructor: function (config) {
+         *              this.callParent(arguments); // calls Ext.panel.Panel's constructor
+         *              //...
+         *          },
+         *
+         *          statics: {
+         *              method: function () {
+         *                  return 'abc';
+         *              }
+         *          }
+         *      });
+         *
+         *      // File: /src/app/PanelPart2.js
+         *      Ext.define('My.app.PanelPart2', {
+         *          override: 'My.app.Panel',
+         *
+         *          constructor: function (config) {
+         *              this.callParent(arguments); // calls My.app.Panel's constructor
+         *              //...
+         *          }
+         *      });
+         *
+         * Another use of overrides is to provide optional parts of classes that can be
+         * independently required. In this case, the class may even be unaware of the
+         * override altogether.
+         *
+         *      Ext.define('My.ux.CoolTip', {
+         *          override: 'Ext.tip.ToolTip',
+         *
+         *          constructor: function (config) {
+         *              this.callParent(arguments); // calls Ext.tip.ToolTip's constructor
+         *              //...
+         *          }
+         *      });
+         *
+         * Overrides can also contain statics:
+         *
+         *      Ext.define('My.app.BarMod', {
+         *          override: 'Ext.foo.Bar',
+         *
+         *          statics: {
+         *              method: function (x) {
+         *                  return this.callParent([x * 2]); // call Ext.foo.Bar.method
+         *              }
+         *          }
+         *      });
+         *
+         * @param {String} className The class name to create in string dot-namespaced format, for example:
+         * 'My.very.awesome.Class', 'FeedViewer.plugin.CoolPager'
+         * It is highly recommended to follow this simple convention:
+         *  - The root and the class name are 'CamelCased'
+         *  - Everything else is lower-cased
+         * Pass `null` to create an anonymous class.
+         * @param {Object} data The key - value pairs of properties to apply to this class. Property names can be of any valid
+         * strings, except those in the reserved listed below:
+         *  - `mixins`
+         *  - `statics`
+         *  - `config`
+         *  - `alias`
+         *  - `self`
+         *  - `singleton`
+         *  - `alternateClassName`
+         *  - `override`
+         *
+         * @param {Function} createdFn Optional callback to execute after the class is created, the execution scope of which
+         * (`this`) will be the newly created class itself.
+         * @return {Ext.Base}
+         * @markdown
+         * @member Ext
+         * @method define
+         */
+        define: function (className, body, createdFn) {
+            var override = body.override,
+                cls, extend, name, namespace;
+
+            if (override) {
+                delete body.override;
+                cls = Ext.getClassByName(override);
+                Ext.override(cls, body);
+            } else {
+                if (className) {
+                    namespace = Ext.createNamespace(className, true);
+                    name = className.substring(className.lastIndexOf('.')+1);
+                }
+
+                cls = function ctor () {
+                    this.constructor.apply(this, arguments);
+                }
+
+                if (className) {
+                    cls.displayName = className;
+                }
+                cls.$isClass = true;
+                cls.callParent = Ext.Base.callParent;
+
+                if (typeof body == 'function') {
+                    body = body(cls);
+                }
+
+                extend = body.extend;
+                if (extend) {
+                    delete body.extend;
+                    if (typeof extend == 'string') {
+                        extend = Ext.getClassByName(extend);
+                    }
+                } else {
+                    extend = Base;
+                }
+
+                Ext.extend(cls, extend, body);
+                if (cls.prototype.constructor === cls) {
+                    delete cls.prototype.constructor;
+                }
+
+                // Not extending a class which derives from Base...
+                if (!cls.prototype.$isClass) {
+                    Ext.applyIf(cls.prototype, Base.prototype);
+                }
+                cls.prototype.self = cls;
+                
+                if (body.xtype) {
+                    Ext.reg(body.xtype, cls);
+                }
+                cls = body.singleton ? new cls() : cls;
+                if (className) {
+                    namespace[name] = cls;
+                }
+            }
+
+            if (createdFn) {
+                createdFn.call(cls);
+            }
+
+            return cls;
+        },
+
+        /**
+         * Overrides members of the specified `target` with the given values.
+         *
+         * If the `target` is a function, it is assumed to be a constructor and the contents
+         * of `overrides` are applied to its `prototype` using {@link Ext#apply Ext.apply}.
+         * 
+         * If the `target` is an instance of a class created using {@link #define},
+         * the `overrides` are applied to only that instance. In this case, methods are
+         * specially processed to allow them to use {@link Ext.Base#callParent}.
+         * 
+         *      var panel = new Ext.Panel({ ... });
+         *      
+         *      Ext.override(panel, {
+         *          initComponent: function () {
+         *              // extra processing...
+         *              
+         *              this.callParent();
+         *          }
+         *      });
+         *
+         * If the `target` is none of these, the `overrides` are applied to the `target`
+         * using {@link Ext#apply Ext.apply}.
+         *
+         * Please refer to {@link Ext#define Ext.define} for further details.
+         *
+         * @param {Object} target The target to override.
+         * @param {Object} overrides The properties to add or replace on `target`. 
          * @method override
          */
-        override : function(origclass, overrides){
-            if(overrides){
-                var p = origclass.prototype;
-                Ext.apply(p, overrides);
-                if(Ext.isIE && overrides.hasOwnProperty('toString')){
-                    p.toString = overrides.toString;
+        override: function (target, overrides) {
+            var proto, statics;
+
+            if (overrides) {
+                if (target.$isClass) {
+                    statics = overrides.statics;
+                    if (statics) {
+                        delete overrides.statics;
+                    }
+
+                    Ext.addMembers(target, target.prototype, overrides, true);
+                    if (statics) {
+                        Ext.addMembers(target, target, statics);
+                    }
+                } else if (typeof target == 'function') {
+                    proto = target.prototype;
+                    Ext.apply(proto, overrides);
+                    if(Ext.isIE && overrides.hasOwnProperty('toString')){
+                        proto.toString = overrides.toString;
+                    }
+                } else {
+                    var owner = target.self,
+                        name, value;
+
+                    if (owner && owner.$isClass) {
+                        for (name in overrides) {
+                            if (overrides.hasOwnProperty(name)) {
+                                value = overrides[name];
+
+                                if (typeof value == 'function') {
+                                    //<debug>
+                                    if (owner.$className) {
+                                        value.displayName = owner.$className + '#' + name;
+                                    }
+                                    //</debug>
+
+                                    value.$name = name;
+                                    value.$owner = owner;
+                                    value.$previous = target.hasOwnProperty(name)
+                                        ? target[name] // already hooked, so call previous hook
+                                        : callOverrideParent; // calls by name on prototype
+                                }
+
+                                target[name] = value;
+                            }
+                        }
+                    } else {
+                        Ext.apply(target, overrides);
+
+                        if (!target.constructor.$isClass) {
+                            target.constructor.prototype.callParent = Base.prototype.callParent;
+                            target.constructor.callParent = Base.callParent;
+                        }
+                    }
                 }
             }
         },
@@ -312,15 +735,29 @@ Company.data.CustomStore = function(config) { ... }
          * @method namespace
          */
         namespace : function(){
-            var o, d;
-            Ext.each(arguments, function(v) {
-                d = v.split(".");
-                o = window[d[0]] = window[d[0]] || {};
-                Ext.each(d.slice(1), function(v2){
-                    o = o[v2] = o[v2] || {};
-                });
-            });
-            return o;
+            var len1 = arguments.length,
+                i = 0,
+                len2,
+                j,
+                main,
+                ns,
+                sub,
+                current;
+
+            for(; i < len1; ++i) {
+                main = arguments[i];
+                ns = arguments[i].split('.');
+                current = window[ns[0]];
+                if (current === undefined) {
+                    current = window[ns[0]] = {};
+                }
+                sub = ns.slice(1);
+                len2 = sub.length;
+                for(j = 0; j < len2; ++j) {
+                    current = current[sub[j]] = current[sub[j]] || {};
+                }
+            }
+            return current;
         },
 
         /**
@@ -554,32 +991,31 @@ function(el){
         getBody : function(){
             return Ext.get(DOC.body || DOC.documentElement);
         },
-        
+
         /**
          * Returns the current document body as an {@link Ext.Element}.
          * @return Ext.Element The document body
+         * @method
          */
         getHead : function() {
             var head;
-            
+
             return function() {
                 if (head == undefined) {
                     head = Ext.get(DOC.getElementsByTagName("head")[0]);
                 }
-                
+
                 return head;
             };
         }(),
 
-        /**
-         * Removes a DOM node from the document.
-         */
         /**
          * <p>Removes this element from the document, removes all DOM event listeners, and deletes the cache reference.
          * All DOM event listeners are removed from this element. If {@link Ext#enableNestedListenerRemoval} is
          * <code>true</code>, then DOM event listeners are also removed from all child nodes. The body node
          * will be ignored if passed in.</p>
          * @param {HTMLElement} node The node to remove
+         * @method
          */
         removeNode : isIE && !isIE8 ? function(){
             var d;
@@ -761,6 +1197,34 @@ function(el){
          * @type Boolean
          */
         isIE8 : isIE8,
+        /**
+         * True if the detected browser is Internet Explorer 9.x.
+         * @type Boolean
+         */
+        isIE9 : isIE9,
+        
+        /**
+         * True if the detected browser is Internet Explorer 10.x
+         * @type Boolean
+         */
+        isIE10 : isIE10,
+        
+        /**
+         * True if the detected browser is Internet Explorer 9.x or lower
+         * @type Boolean
+         */
+        isIE9m : isIE9m,
+        
+        /**
+         * True if the detected browser is Internet Explorer 10.x or higher
+         * @type Boolean
+         */ 
+        isIE10p : isIE && !(isIE6 || isIE7 || isIE8 || isIE9),
+        
+        // IE10 quirks behaves like Gecko/WebKit quirks, so don't include it here
+        // Used internally
+        isIEQuirks: isIE && (!isStrict && (isIE6 || isIE7 || isIE8 || isIE9)),
+                
         /**
          * True if the detected browser uses the Gecko layout engine (e.g. Mozilla, Firefox).
          * @type Boolean
@@ -1277,14 +1741,14 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         },
 
         getViewportHeight: function(){
-	        return Ext.isIE ? 
+	        return Ext.isIE9m ? 
 	        	   (Ext.isStrict ? doc.documentElement.clientHeight : doc.body.clientHeight) :
 	        	   self.innerHeight;
         },
 
         getViewportWidth : function() {
 	        return !Ext.isStrict && !Ext.isOpera ? doc.body.clientWidth :
-	        	   Ext.isIE ? doc.documentElement.clientWidth : self.innerWidth;
+	        	   Ext.isIE9m ? doc.documentElement.clientWidth : self.innerWidth;
         },
         
         getY : function(el) {
@@ -1658,6 +2122,9 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
             if (ev.preventDefault) {
                 ev.preventDefault();
             } else {
+                if (ev.keyCode) {
+                    ev.keyCode = 0;
+                }
                 ev.returnValue = false;
             }
         },
@@ -1696,7 +2163,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         _load : function(e) {
             loadComplete = true;
             
-            if (Ext.isIE && e !== true) {
+            if (Ext.isIE9m && e !== true) {
                 // IE8 complains that _load is null or not an object
                 // so lets remove self via arguments.callee
                 doRemove(win, "load", arguments.callee);
@@ -1746,8 +2213,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 * http://developer.yahoo.net/yui/license.txt
 */
 Ext.lib.Ajax = function() {
-    var activeX = ['Msxml2.XMLHTTP.6.0',
-                   'Msxml2.XMLHTTP.3.0',
+    var activeX = ['Msxml2.XMLHTTP.3.0',
                    'Msxml2.XMLHTTP'],
         CONTENTTYPE = 'Content-Type';
 
@@ -1979,7 +2445,7 @@ Ext.lib.Ajax = function() {
         try {
             http = new XMLHttpRequest();
         } catch(e) {
-            for (var i = 0; i < activeX.length; ++i) {
+            for (var i = Ext.isIE6 ? 1 : 0; i < activeX.length; ++i) {
                 try {
                     http = new ActiveXObject(activeX[i]);
                     break;
@@ -2870,7 +3336,7 @@ Ext.lib.Ajax = function() {
         }
     });
 })();	
-	if (Ext.isIE) {
+	if (Ext.isIE9m) {
         function fnCleanUp() {
             var p = Function.prototype;
             delete p.createSequence;
@@ -2883,12 +3349,26 @@ Ext.lib.Ajax = function() {
         }
         window.attachEvent("onunload", fnCleanUp);
     }
-})();/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+})();/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext
  */
@@ -3095,9 +3575,7 @@ ImageComponent = Ext.extend(Ext.BoxComponent, {
          * intended for arguments of type {@link Ext.Element} and {@link Ext.Component}, but any subclass of
          * {@link Ext.util.Observable} can be passed in.  Any number of elements and/or components can be
          * passed into this function in a single call as separate arguments.
-         * @param {Mixed} arg1 An {@link Ext.Element}, {@link Ext.Component}, or an Array of either of these to destroy
-         * @param {Mixed} arg2 (optional)
-         * @param {Mixed} etc... (optional)
+         * @param {Mixed...} args An {@link Ext.Element}, {@link Ext.Component}, or an Array of either of these to destroy
          */
         destroy : function(){
             Ext.each(arguments, function(arg){
@@ -3571,12 +4049,26 @@ Ext.applyIf(Number.prototype, {
         return Math.min(Math.max(this, min), max);
     }
 });
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 (function(){
 
 var EXTUTIL = Ext.util,
@@ -4099,12 +4591,26 @@ EXTUTIL.Event.prototype = {
 
 };
 })();
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.util.DelayedTask
  * <p> The DelayedTask class provides a convenient way to "buffer" the execution of a method,
@@ -4130,7 +4636,7 @@ Ext.get('myInputField').on('keypress', function(){
  * also setup a delayed task for you to buffer events.</p> 
  * @constructor The parameters to this constructor serve as defaults and are not required.
  * @param {Function} fn (optional) The default function to call.
- * @param {Object} scope The default scope (The <code><b>this</b></code> reference) in which the
+ * @param {Object} scope (optional) The default scope (The <code><b>this</b></code> reference) in which the
  * function is called. If not specified, <code>this</code> will refer to the browser window.
  * @param {Array} args (optional) The default Array of arguments.
  */
@@ -4168,12 +4674,26 @@ Ext.util.DelayedTask = function(fn, scope, args){
             id = null;
         }
     };
-};/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+};/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.Element
  * <p>Encapsulates a DOM element, adding simple DOM manipulation facilities, normalizing for browser differences.</p>
@@ -4864,23 +5384,23 @@ el.un('click', this.handlerFn);
             isBrokenOnTable = false,
             hasGetAttribute = 'getAttribute' in test,
             unknownRe = /undefined|unknown/;
-            
+
         if (hasGetAttribute) {
-            
+
             try {
                 test.getAttribute('ext:qtip');
             } catch (e) {
                 isBrokenOnTable = true;
             }
-            
+
             return function(name, ns) {
                 var el = this.dom,
                     value;
-                
+
                 if (el.getAttributeNS) {
                     value  = el.getAttributeNS(ns, name) || null;
                 }
-            
+
                 if (value == null) {
                     if (ns) {
                         if (isBrokenOnTable && el.tagName.toUpperCase() == 'TABLE') {
@@ -4903,7 +5423,7 @@ el.un('click', this.handlerFn);
                 var el = this.om,
                     value,
                     attribute;
-                
+
                 if (ns) {
                     attribute = el[ns + ':' + name];
                     value = unknownRe.test(typeof attribute) ? undefined : attribute;
@@ -4915,7 +5435,7 @@ el.un('click', this.handlerFn);
         }
         test = null;
     })(),
-        
+
     /**
     * Update the innerHTML of this element
     * @param {String} html The new HTML
@@ -4966,10 +5486,6 @@ ep.autoBoxAdjust = true;
 // private
 var unitPattern = /\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i,
     docEl;
-
-/**
- * @private
- */
 
 /**
  * Retrieves Ext.Element objects.
@@ -5080,6 +5596,7 @@ function garbageCollect(){
         for(eid in EC){
             o = EC[eid];
             if(o.skipGC){
+                Ext.EventManager.removeFromSpecialCache(o.el);
                 continue;
             }
             el = o.el;
@@ -5197,12 +5714,26 @@ if(Ext.isIE || Ext.isGecko){
 }
 
 })();
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.Element
  */
@@ -5505,7 +6036,7 @@ Ext.Element.addMethods(function(){
                 s = me.dom.style;
 
             if(!animate || !me.anim){
-                if(Ext.isIE){
+                if(Ext.isIE9m){
                     var opac = opacity < 1 ? 'alpha(opacity=' + opacity * 100 + ')' : '',
                     val = s.filter.replace(opacityRe, '').replace(trimRe, '');
 
@@ -5526,7 +6057,7 @@ Ext.Element.addMethods(function(){
          */
         clearOpacity : function(){
             var style = this.dom.style;
-            if(Ext.isIE){
+            if(Ext.isIE9m){
                 if(!Ext.isEmpty(style.filter)){
                     style.filter = style.filter.replace(opacityRe, '').replace(trimRe, '');
                 }
@@ -5544,7 +6075,7 @@ Ext.Element.addMethods(function(){
         getHeight : function(contentHeight){
             var me = this,
                 dom = me.dom,
-                hidden = Ext.isIE && me.isStyle('display', 'none'),
+                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
                 h = MATH.max(dom.offsetHeight, hidden ? 0 : dom.clientHeight) || 0;
 
             h = !contentHeight ? h : h - me.getBorderWidth("tb") - me.getPadding("tb");
@@ -5559,7 +6090,7 @@ Ext.Element.addMethods(function(){
         getWidth : function(contentWidth){
             var me = this,
                 dom = me.dom,
-                hidden = Ext.isIE && me.isStyle('display', 'none'),
+                hidden = Ext.isIE9m && me.isStyle('display', 'none'),
                 w = MATH.max(dom.offsetWidth, hidden ? 0 : dom.clientWidth) || 0;
             w = !contentWidth ? w : w - me.getBorderWidth("lr") - me.getPadding("lr");
             return w < 0 ? 0 : w;
@@ -5700,12 +6231,26 @@ Ext.fly('elId').setHeight(150, {
     };
 }()
 );
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.EventManager
  * Registers event handlers that want to receive a normalized EventObject instead of the standard browser event and provides
@@ -5717,7 +6262,7 @@ Ext.EventManager = function(){
     var docReadyEvent,
         docReadyProcId,
         docReadyState = false,
-        DETECT_NATIVE = Ext.isGecko || Ext.isWebKit || Ext.isSafari,
+        DETECT_NATIVE = Ext.isGecko || Ext.isWebKit || Ext.isSafari || Ext.isIE10p,
         E = Ext.lib.Event,
         D = Ext.lib.Dom,
         DOC = document,
@@ -5737,7 +6282,7 @@ Ext.EventManager = function(){
             len = specialElCache.length,
             skip = false,
             o;
-            
+
         if (el) {
             if (el.getElementById || el.navigator) {
                 // look up the id
@@ -5830,7 +6375,7 @@ Ext.EventManager = function(){
      */
     function checkReadyState(e){
 
-        if(Ext.isIE && doScrollChk()){
+        if(Ext.isIE9m && doScrollChk()){
             return true;
         }
         if(DOC.readyState == COMPLETE){
@@ -5867,7 +6412,7 @@ Ext.EventManager = function(){
             if(DETECT_NATIVE) {
                 DOC.removeEventListener(DOMCONTENTLOADED, fireDocReady, false);
             }
-            if(Ext.isIE && checkReadyState.bindIE){  //was this was actually set ??
+            if(Ext.isIE9m && checkReadyState.bindIE){  //was this was actually set ??
                 DOC.detachEvent('onreadystatechange', checkReadyState);
             }
             E.un(WINDOW, "load", arguments.callee);
@@ -5888,7 +6433,7 @@ Ext.EventManager = function(){
         /*
          * Handle additional (exceptional) detection strategies here
          */
-        if (Ext.isIE){
+        if (Ext.isIE9m){
             //Use readystatechange as a backup AND primary detection mechanism for a FRAME/IFRAME
             //See if page is already loaded
             if(!checkReadyState()){
@@ -6180,6 +6725,17 @@ Ext.EventManager = function(){
                 return null;
             }
         },
+        
+        removeFromSpecialCache: function(o) {
+            var i = 0,
+                len = specialElCache.length;
+                
+            for (; i < len; ++i) {
+                if (specialElCache[i].el == o) {
+                    specialElCache.splice(i, 1); 
+                }
+            }
+        },
 
         purgeElement : function(el, recurse, eventName) {
             el = Ext.getDom(el);
@@ -6303,11 +6859,41 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
             return false;
         }
 
-        var cls = [' ',
-                Ext.isIE ? "ext-ie " + (Ext.isIE6 ? 'ext-ie6' : (Ext.isIE7 ? 'ext-ie7' : (Ext.isIE8 ? 'ext-ie8' : 'ext-ie9')))
-                : Ext.isGecko ? "ext-gecko " + (Ext.isGecko2 ? 'ext-gecko2' : 'ext-gecko3')
-                : Ext.isOpera ? "ext-opera"
-                : Ext.isWebKit ? "ext-webkit" : ""];
+        var cls = [];
+        
+        if (Ext.isIE) {
+            // Only treat IE9 and less like IE in the css
+            if (!Ext.isIE10p) {
+                cls.push('ext-ie');
+            }
+            if (Ext.isIE6) {
+                cls.push('ext-ie6');
+            } else if (Ext.isIE7) {
+                cls.push('ext-ie7', 'ext-ie7m');
+            } else if (Ext.isIE8) {
+                cls.push('ext-ie8', 'ext-ie8m');
+            } else if (Ext.isIE9) {
+                cls.push('ext-ie9', 'ext-ie9m');
+            } else if (Ext.isIE10) {
+                cls.push('ext-ie10');
+            }
+        }
+        
+        if (Ext.isGecko) {
+            if (Ext.isGecko2) {
+                cls.push('ext-gecko2');
+            } else {
+                cls.push('ext-gecko3');
+            }
+        }
+        
+        if (Ext.isOpera) {
+            cls.push('ext-opera');
+        }
+        
+        if (Ext.isWebKit) {
+            cls.push('ext-webkit');
+        }
 
         if (Ext.isSafari) {
             cls.push("ext-safari " + (Ext.isSafari2 ? 'ext-safari2' : (Ext.isSafari3 ? 'ext-safari3' : 'ext-safari4')));
@@ -6328,7 +6914,7 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
             if (p) {
                 if (!Ext.isStrict) {
                     Ext.fly(p, '_internal').addClass('x-quirks');
-                    if (Ext.isIE && !Ext.isStrict) {
+                    if (Ext.isIE9m && !Ext.isStrict) {
                         Ext.isIEQuirks = true;
                     }
                 }
@@ -6341,48 +6927,50 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
             Ext.isForcedBorderBox = true;
             cls.push("ext-forced-border-box");
         }
-        
+
         Ext.fly(bd, '_internal').addClass(cls);
         return true;
     };
-    
+
     if (!initExtCss()) {
         Ext.onReady(initExtCss);
     }
 })();
 
-/**
- * Code used to detect certain browser feature/quirks/bugs at startup.
- */
+// Code used to detect certain browser feature/quirks/bugs at startup.
 (function(){
+    /**
+     * @class Ext.supports
+     * @ignore
+     */
     var supports = Ext.apply(Ext.supports, {
         /**
          * In Webkit, there is an issue with getting the margin right property, see
          * https://bugs.webkit.org/show_bug.cgi?id=13343
          */
         correctRightMargin: true,
-        
+
         /**
          * Webkit browsers return rgba(0, 0, 0) when a transparent color is used
          */
         correctTransparentColor: true,
-        
+
         /**
          * IE uses styleFloat, not cssFloat for the float property.
          */
         cssFloat: true
     });
-    
+
     var supportTests = function(){
             var div = document.createElement('div'),
                 doc = document,
                 view,
                 last;
-                
+
             div.innerHTML = '<div style="height:30px;width:50px;"><div style="height:20px;width:20px;"></div></div><div style="float:left;background-color:transparent;">';
             doc.body.appendChild(div);
             last = div.lastChild;
-            
+
             if((view = doc.defaultView)){
                 if(view.getComputedStyle(div.firstChild.firstChild, null).marginRight != '0px'){
                     supports.correctRightMargin = false;
@@ -6394,9 +6982,9 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
             supports.cssFloat = !!last.style.cssFloat;
             doc.body.removeChild(div);
     };
-    
+
     if (Ext.isReady) {
-        supportTests();    
+        supportTests();
     } else {
         Ext.onReady(supportTests);
     }
@@ -6625,7 +7213,7 @@ Ext.EventObject = function(){
         </code></pre>
          * @param {Mixed} el The id, DOM element or Ext.Element to check
          * @param {Boolean} related (optional) true to test if the related target is within el instead of the target
-         * @param {Boolean} allowEl {optional} true to also check if the passed element is the target or related target
+         * @param {Boolean} allowEl (optional) true to also check if the passed element is the target or related target
          * @return {Boolean}
          */
         within : function(el, related, allowEl){
@@ -6638,12 +7226,26 @@ Ext.EventObject = function(){
      };
 
     return new Ext.EventObjectImpl();
-}();/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+}();/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.util.JSON
  * Modified version of Douglas Crockford"s json.js that doesn"t
@@ -6828,12 +7430,26 @@ Ext.encode = Ext.util.JSON.encode;
  * @method decode
  */
 Ext.decode = Ext.util.JSON.decode;
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.Direct
  * @extends Ext.util.Observable
@@ -7062,12 +7678,26 @@ Ext.Direct.addProvider(
 Ext.Direct = new Ext.Direct();
 
 Ext.Direct.TID = 1;
-Ext.Direct.PROVIDERS = {};/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+Ext.Direct.PROVIDERS = {};/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.direct.Provider
  * @extends Ext.util.Observable
@@ -7172,12 +7802,26 @@ p.disconnect();
      */
     disconnect: Ext.emptyFn
 });
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.direct.JsonProvider
  * @extends Ext.direct.Provider
@@ -7216,12 +7860,26 @@ Ext.direct.JsonProvider = Ext.extend(Ext.direct.Provider, {
         }
         return events;
     }
-});/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+});/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.direct.RemotingProvider
  * @extends Ext.direct.JsonProvider
@@ -7595,12 +8253,26 @@ TestAction.multiply(
         }
     }
 });
-Ext.Direct.PROVIDERS['remoting'] = Ext.direct.RemotingProvider;/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+Ext.Direct.PROVIDERS['remoting'] = Ext.direct.RemotingProvider;/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /**
  * @class Ext.Direct.Transaction
  * @extends Object
@@ -7626,12 +8298,26 @@ Ext.Direct.Transaction.prototype = {
     getProvider: function(){
         return this.provider;
     }
-};/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+};/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 Ext.Direct.Event = function(config){
     Ext.apply(this, config);
 };
@@ -7660,12 +8346,26 @@ Ext.Direct.eventTypes = {
     'event':  Ext.Direct.Event,
     'exception':  Ext.Direct.ExceptionEvent
 };
-/*!
- * Ext JS Library 3.4.0
- * Copyright(c) 2006-2011 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
- */
+/*
+This file is part of Ext JS 3.4
+
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 (function(){
     var BEFOREREQUEST = "beforerequest",
         REQUESTCOMPLETE = "requestcomplete",
