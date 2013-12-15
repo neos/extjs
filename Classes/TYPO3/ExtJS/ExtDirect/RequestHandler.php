@@ -34,6 +34,11 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 	protected $exposeExceptionInformation = FALSE;
 
 	/**
+	 * @var array
+	 */
+	protected $flowSettings;
+
+	/**
 	 * Checks if the request handler can handle the current request.
 	 *
 	 * @return boolean TRUE if it can handle the request, otherwise FALSE
@@ -64,7 +69,7 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 
 		$this->boot();
 		$this->resolveDependencies();
-		$this->request->injectSettings($this->settings);
+		$this->request->injectSettings($this->flowSettings);
 
 		$this->router->setRoutesConfiguration($this->routesConfiguration);
 
@@ -150,6 +155,7 @@ class RequestHandler extends \TYPO3\Flow\Http\RequestHandler {
 
 		$configurationManager = $objectManager->get('TYPO3\Flow\Configuration\ConfigurationManager');
 		$this->settings = $configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.ExtJS');
+		$this->flowSettings = $configurationManager->getConfiguration(\TYPO3\Flow\Configuration\ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'TYPO3.Flow');
 	}
 
 	/**
