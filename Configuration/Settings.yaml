@@ -13,3 +13,18 @@ TYPO3:
     ExtDirect:
       # Output exception information to the client in Ext Direct requests
       exposeExceptionInformation: TRUE
+      httpComponentChain:
+        'preprocess':
+          position: 'before process'
+          chain: []
+
+        'process':
+          chain:
+            'dispatching':
+              component: 'TYPO3\ExtJS\ExtDirect\DispatchComponent'
+
+        'postprocess':
+          chain:
+            'standardsCompliance':
+              position: 'end'
+              component: 'TYPO3\Flow\Http\Component\StandardsComplianceComponent'
